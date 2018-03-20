@@ -2,12 +2,18 @@
 
 # TODO: Improve.
 
-if ! ./true; then
-  echo "`true` failed."
-  exit 1
-fi
+function expect() {
+  expected=$1
+  shift
+  $@
+  actual=$?
+  if [[ $expected -ne $actual ]]; then
+    echo "Expected $expected, got $actual with program: $@"
+    exit 1
+  fi
+}
 
-if ./false; then
-  echo "`false` failed."
-  exit 0
-fi
+expect 0 ./true
+expect 1 ./false
+expect 1 ./argc
+expect 2 ./argc a
