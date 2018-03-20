@@ -1,0 +1,5 @@
+examples/*
+!examples/Makefile
+!examples/runTests
+!examples/*.c
+!examples/*.h

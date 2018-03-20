@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# TODO: Improve.
+
+if ! ./true; then
+  echo "`true` failed."
+  exit 1
+fi
+
+if ./false; then
+  echo "`false` failed."
+  exit 0
+fi
