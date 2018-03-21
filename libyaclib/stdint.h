@@ -1,5 +1,7 @@
 #pragma once
 
+#include "stdinternaltypes.h"
+
 // NOTE: This is GCC-on-x86-64 specific.
 // TODO: #if's for choosing the correct size.
 typedef signed char    int8_t;
@@ -33,8 +35,8 @@ typedef uint32_t uint_fast32_t;
 typedef uint64_t uint_fast64_t;
 
 // We assume 64 bits.
-typedef int64_t  intptr_t;
-typedef uint64_t uintptr_t;
+typedef __intptr_t  intptr_t;
+typedef __uintptr_t uintptr_t;
 
 // We don't really care about anything bigger.
 typedef int64_t  intmax_t;
@@ -108,3 +110,8 @@ typedef uint64_t uintmax_t;
 
 #define INTMAX_C  intmax_t
 #define UINTMAX_C uintmax_t
+
+#define PTRDIFF_MIN INTPTR_MIN
+#define PTRDIFF_MAX INTPTR_MAX
+
+#define SIZE_MAX UINTPTR_MAX
