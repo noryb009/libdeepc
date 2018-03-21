@@ -15,3 +15,5 @@ extern _Noreturn void __abort();
     } \
   } while (0)
 #endif
+
+#define static_assert _Static_assert
