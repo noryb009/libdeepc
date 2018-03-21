@@ -17,3 +17,4 @@ expect 0 ./true
 expect 1 ./false
 expect 1 ./argc
 expect 2 ./argc a
+expect 0 ./stdint
