@@ -41,12 +41,16 @@ _Noreturn void quick_exit(int ret) {
   run_exit_funcs(at_quick_exit_funcs, cur_at_quick_exit_func);
   exit(ret);
 }
-extern _Noreturn void __exit(int ret);
-_Noreturn void _Exit(int ret) {
-  __exit(ret);
+
+_Noreturn void __abort() {
+  _Exit(1);
 }
 
-extern _Noreturn void __abort();
 _Noreturn void abort() {
   __abort();
+}
+
+_Noreturn void __stack_chk_fail() {
+  // TODO: Output fail message.
+  _Exit(42);
 }
