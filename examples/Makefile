@@ -5,35 +5,25 @@ CFLAGS := -O0 -g
 COMMAND := $(CC) $(CFLAGS) -nostdlib -nostdinc -I ../libyaclib/ -L ../libyaclib ../libyaclib/start.S
 LIBS := -l:libyaclib.a
 
-all: libyaclib true false argc stdint stdarg assert assert-fail
+single-file-tests = true false argc stdint stdarg assert assert-fail string
+
+.PHONY: all libyaclib clean $(single-file-tests)
+
+all: libyaclib $(single-file-tests)
 
 libyaclib:
 	cd ../libyaclib/ && make all
 
 clean:
 	cd ../libyaclib && make clean
-	rm -f true false argc stdint stdarg assert assert-fail
+	rm -f ${single-file-tests}
 
-true:
-	$(COMMAND) -o true true.c $(LIBS)
+define make-single-target
+  $1:
+	  $(COMMAND) -o $1 $1.c $(LIBS)
+endef
 
-false:
-	$(COMMAND) -o false false.c $(LIBS)
-
-argc:
-	$(COMMAND) -o argc argc.c $(LIBS)
-
-stdint:
-	$(COMMAND) -o stdint stdint.c $(LIBS)
-
-stdarg:
-	$(COMMAND) -o stdarg stdarg.c $(LIBS)
-
-assert:
-	$(COMMAND) -o assert assert.c $(LIBS)
-
-assert-fail:
-	$(COMMAND) -o assert-fail assert-fail.c $(LIBS)
+$(foreach element,$(single-file-tests),$(eval $(call make-single-target,$(element))))
 
 test: all
 	./runTests
