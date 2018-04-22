@@ -13,6 +13,29 @@ function expect() {
   fi
 }
 
+function expectIO() {
+  expected=$1
+  shift
+  input=$1
+  shift
+  output=$1
+  shift
+  actual_output="$(echo -n "$input" | $@)"
+  actual=$?
+  if [[ $expected -ne $actual ]]; then
+    echo "Expected $expected, got $actual with program: $@"
+    exit 1
+  fi
+  if [[ "$output" != "$actual_output" ]]; then
+    echo "Expected different output with program: $@"
+    echo "Expected:"
+    echo "$output"
+    echo "Got:"
+    echo "$actual_output"
+    exit 1
+  fi
+}
+
 expect 0 ./true
 expect 1 ./false
 expect 1 ./argc
@@ -27,3 +50,5 @@ expect 0 ./strlen ""
 expect 7 ./strlen zyxwvut
 expect 5 ./setjmp
 expect 0 ./malloc
+expectIO 0 "" $'abcd\nefgh' ./chario "abcd" "efgh"
+expectIO 0 $'abcd\nefgh' $'abcd\nefgh' ./echo

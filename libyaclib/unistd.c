@@ -4,7 +4,9 @@
 #include "unistd.h"
 
 typedef enum {
-  SYS_BRK = 12
+  SYS_READ = 0,
+  SYS_WRITE = 1,
+  SYS_BRK = 12,
 } Syscall;
 
 extern uint64_t __syscall0(Syscall);
@@ -26,4 +28,22 @@ void *sbrk(intptr_t increment) {
     return (void *)-1;
   }
   return (void *)cur_break;
+}
+
+ssize_t read(int fd, void *buf, size_t count) {
+  const ssize_t ret = (ssize_t)__syscall3(fd, (uint64_t)buf, count, SYS_READ);
+  if (ret < 0) {
+    errno = -ret;
+    return -1;
+  }
+  return ret;
+}
+
+ssize_t write(int fd, const void *buf, size_t count) {
+  const ssize_t ret = (ssize_t)__syscall3(fd, (uint64_t)buf, count, SYS_WRITE);
+  if (ret < 0) {
+    errno = -ret;
+    return -1;
+  }
+  return ret;
 }

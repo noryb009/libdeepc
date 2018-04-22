@@ -5,7 +5,7 @@ CFLAGS := -O0 -g
 COMMAND := $(CC) $(CFLAGS) -nostdlib -nostdinc -fno-builtin -I ../libyaclib/ -L ../libyaclib ../libyaclib/start.S
 LIBS := -l:libyaclib.a
 
-single-file-tests = true false argc stdint stdarg assert assert-fail string strlen setjmp malloc strlen
+single-file-tests = true false argc stdint stdarg assert assert-fail string strlen setjmp malloc strlen chario echo
 
 .PHONY: all libyaclib clean $(single-file-tests)
 
