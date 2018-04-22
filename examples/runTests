@@ -53,3 +53,4 @@ expect 0 ./malloc
 expectIO 0 "" $'abcd\nefgh' ./chario "abcd" "efgh"
 expectIO 0 $'abcd\nefgh' $'abcd\nefgh' ./echo
 expect 0 ./ctype
+expectIO 0 "" $'abc, defgh, i' ./printf
