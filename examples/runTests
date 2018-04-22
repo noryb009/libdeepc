@@ -52,3 +52,4 @@ expect 5 ./setjmp
 expect 0 ./malloc
 expectIO 0 "" $'abcd\nefgh' ./chario "abcd" "efgh"
 expectIO 0 $'abcd\nefgh' $'abcd\nefgh' ./echo
+expect 0 ./ctype
