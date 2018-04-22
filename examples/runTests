@@ -22,3 +22,4 @@ expect 0 ./stdarg
 expect 2 ./assert
 expect 1 ./assert-fail
 expect 3 ./string
+expect 5 ./setjmp
