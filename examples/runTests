@@ -43,7 +43,7 @@ expect 2 ./argc a
 expect 0 ./stdint
 expect 0 ./stdarg
 expect 2 ./assert
-expect 1 ./assert-fail
+expectIO 1 "" $'Assert failure:\n  File: assert-fail.c\n  Func: main' ./assert-fail
 expect 3 ./string
 expect 5 ./strlen abcde
 expect 0 ./strlen ""

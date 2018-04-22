@@ -2,16 +2,15 @@
 
 #include "stdinternaltypes.h"
 
-extern _Noreturn void __abort();
+_Noreturn void __assert_failure();
 
-// TODO: Output something useful.
 #ifdef NDEBUG
 #define assert(cond) do {} while(0)
 #else
 #define assert(cond) \
   do { \
     if (!(cond)) { \
-      __abort(); \
+      __assert_failure(__FILE__, __LINE__, __func__); \
     } \
   } while (0)
 #endif

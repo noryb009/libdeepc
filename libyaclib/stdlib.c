@@ -42,12 +42,8 @@ _Noreturn void quick_exit(int ret) {
   exit(ret);
 }
 
-_Noreturn void __abort() {
-  _Exit(1);
-}
-
 _Noreturn void abort() {
-  __abort();
+  _Exit(1);
 }
 
 _Noreturn void __stack_chk_fail() {
