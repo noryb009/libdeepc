@@ -2,10 +2,10 @@
 
 CC := gcc
 CFLAGS := -O0 -g
-COMMAND := $(CC) $(CFLAGS) -nostdlib -nostdinc -I ../libyaclib/ -L ../libyaclib ../libyaclib/start.S
+COMMAND := $(CC) $(CFLAGS) -nostdlib -nostdinc -fno-builtin -I ../libyaclib/ -L ../libyaclib ../libyaclib/start.S
 LIBS := -l:libyaclib.a
 
-single-file-tests = true false argc stdint stdarg assert assert-fail string setjmp
+single-file-tests = true false argc stdint stdarg assert assert-fail string strlen setjmp malloc strlen
 
 .PHONY: all libyaclib clean $(single-file-tests)
 

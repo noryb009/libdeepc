@@ -1,9 +1,9 @@
 # TODO: Improve.
 
 CC := gcc
-CFLAGS := -O0 -g
+CFLAGS := -O0 -g -nostdlib -nostdinc -fno-builtin
 
-OBJECTS = libc.o errno.o stdlib.o setjmp.o
+OBJECTS = libc.o errno.o stdlib.o setjmp.o unistd.o syscall.o malloc.o string.o
 DEPENDS = ${OBJECTS:.o=.d}
 
 all: libyaclib.a

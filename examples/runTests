@@ -22,4 +22,8 @@ expect 0 ./stdarg
 expect 2 ./assert
 expect 1 ./assert-fail
 expect 3 ./string
+expect 5 ./strlen abcde
+expect 0 ./strlen ""
+expect 7 ./strlen zyxwvut
 expect 5 ./setjmp
+expect 0 ./malloc

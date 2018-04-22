@@ -18,26 +18,8 @@ _Noreturn void _Exit(int ret);
 _Noreturn void abort();
 
 // Memory management.
-
-void *malloc(size_t size) {
-  // TODO
-  return __NULL;
-}
-
-void *calloc(size_t num, size_t size) {
-  // TODO
-  return __NULL;
-}
-
-void *realloc(void *ptr, size_t new_size) {
-  // TODO
-  return __NULL;
-}
-
-void free(void *ptr) {
-  // TODO
-}
-
-void *aligned_alloc(size_t alignment, size_t size) {
-  // TODO
-}
+void *malloc(size_t size);
+void *calloc(size_t num, size_t size);
+void *realloc(void *ptr, size_t new_size);
+void free(void *ptr);
+void *aligned_alloc(size_t alignment, size_t size);
