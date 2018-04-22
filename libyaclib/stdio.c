@@ -26,5 +26,14 @@ int puts(const char *s) {
   if (ret < 0) {
     return EOF;
   }
-  return ret;
+  if (ret < len) {
+    return ret;
+  }
+  // Output newline.
+  const char c = '\n';
+  const ssize_t ret_newline = write(1, &c, 1);
+  if (ret_newline < 0) {
+    return EOF;
+  }
+  return ret + ret_newline;
 }
