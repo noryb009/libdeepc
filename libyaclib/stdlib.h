@@ -23,3 +23,13 @@ void *calloc(size_t num, size_t size);
 void *realloc(void *ptr, size_t new_size);
 void free(void *ptr);
 void *aligned_alloc(size_t alignment, size_t size);
+
+// String conversions.
+int atoi(const char *str);
+long atol(const char *str);
+long long atoll(const char *str);
+
+long strtol(const char * restrict str, char ** restrict str_end, int base);
+long long strtoll(const char * restrict str, char ** restrict str_end, int base);
+unsigned long strtoul(const char * restrict str, char ** restrict str_end, int base);
+unsigned long long strtoull(const char * restrict str, char ** restrict str_end, int base);
