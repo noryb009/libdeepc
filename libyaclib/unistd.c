@@ -7,6 +7,7 @@ typedef enum {
   SYS_READ = 0,
   SYS_WRITE = 1,
   SYS_BRK = 12,
+  SYS_EXIT = 60,
 } Syscall;
 
 extern uint64_t __syscall0(Syscall);
@@ -46,4 +47,10 @@ ssize_t write(int fd, const void *buf, size_t count) {
     return -1;
   }
   return ret;
+}
+
+extern _Noreturn void __syscall1_noret(uint64_t, Syscall);
+
+_Noreturn void _Exit(int ret) {
+  __syscall1_noret(ret, SYS_EXIT);
 }

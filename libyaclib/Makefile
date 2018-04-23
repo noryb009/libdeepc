@@ -3,7 +3,7 @@
 CC := gcc
 CFLAGS := -O0 -g -nostdlib -nostdinc -fno-builtin
 
-OBJECTS = libc.o errno.o stdlib.o setjmp.o unistd.o syscall.o malloc.o string.o stdio.o ctype.o printf.o assert.o atoi.o
+OBJECTS = errno.o stdlib.o setjmp.o unistd.o syscall.o malloc.o string.o stdio.o ctype.o printf.o assert.o atoi.o
 DEPENDS = ${OBJECTS:.o=.d}
 
 all: libyaclib.a

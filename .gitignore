@@ -4,3 +4,4 @@ examples/*
 !*/runTests
 !*/*.c
 !*/*.h
+!*/*.S
