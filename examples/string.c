@@ -73,18 +73,98 @@ void test_strfuncs() {
   assert(memcmp(c, "abcd\0\0", 6) == 0);
   assert(strncat(c, "efgh", 8) == c);
   assert(memcmp(c, "abcdefgh\0\0", 10) == 0);
+}
 
-  /*assert(strcmp("abc", "abc") == 0);
+void test_cmpfuncs() {
+  assert(strcmp("abc", "abc") == 0);
   assert(strcmp("aac", "abc") < 0);
   assert(strcmp("acc", "abc") > 0);
   assert(strcmp("ab", "abc") < 0);
-  assert(strcmp("abcc", "abc") > 0);*/
+  assert(strcmp("abcc", "abc") > 0);
+
+  assert(strcmp("abc", "abc") == 0);
+  assert(strcmp("aac", "abc") < 0);
+  assert(strcmp("acc", "abc") > 0);
+  assert(strcmp("ab", "abc") < 0);
+  assert(strcmp("abcc", "abc") > 0);
+
+  assert(strncmp("abc", "abc", 8) == 0);
+  assert(strncmp("abcd", "abce", 3) == 0);
+  assert(strncmp("aac", "abc", 5) < 0);
+  assert(strncmp("acc", "abc", 5) > 0);
+  assert(strncmp("ab", "abc", 2) == 0);
+  assert(strncmp("ab", "abc", 3) < 0);
+  assert(strncmp("abcc", "abc", 3) == 0);
+  assert(strncmp("abcc", "abc", 4) > 0);
+
+  assert(strchr("", 'c') == NULL);
+  const char *c3 = "abcdaa";
+  assert(strchr(c3, '\0') == c3 + 6);
+  assert(strchr(c3, 'z') == NULL);
+  assert(strchr(c3, 'a') == c3);
+  assert(strchr(c3, 'b') == c3 + 1);
+  assert(strchr(c3 + 2, 'a') == c3 + 4);
+  assert(strchr(c3 + 5, 'a') == c3 + 5);
+  assert(strchr(c3 + 6, 'a') == NULL);
+  assert(strchr(c3 + 6, '\0') == c3 + 6);
+
+  assert(strrchr(c3, '\0') == c3 + 6);
+  assert(strrchr(c3, 'z') == NULL);
+  assert(strrchr(c3, 'a') == c3 + 5);
+  assert(strrchr(c3, 'b') == c3 + 1);
+  assert(strrchr(c3 + 2, 'a') == c3 + 5);
+  assert(strrchr(c3 + 5, 'a') == c3 + 5);
+  assert(strrchr(c3 + 6, 'a') == NULL);
+  assert(strrchr(c3 + 6, '\0') == c3 + 6);
+
+  const char *c4 = "abcdefgabcdefg";
+  assert(strspn(c4, "") == 0);
+  assert(strspn(c4, "zy") == 0);
+  assert(strspn(c4, "a") == 1);
+  assert(strspn(c4, "ba") == 2);
+  assert(strspn(c4 + 2, "abcdehfg") == 12);
+  assert(strspn(c4 + 10, "ghfeadusi") == 4);
+  assert(strspn(c4 + 10, "ghfeadusi") == 4);
+
+  assert(strcspn(c4, "") == 14);
+  assert(strcspn(c4, "zy") == 14);
+  assert(strcspn(c4, "a") == 0);
+  assert(strcspn(c4, "ba") == 0);
+  assert(strcspn(c4, "b") == 1);
+  assert(strcspn(c4 + 2, "ab") == 5);
+  assert(strcspn(c4 + 10, "zvkploabc") == 4);
+
+  assert(strpbrk(c4, "") == NULL);
+  assert(strpbrk(c4, "zy") == NULL);
+  assert(strpbrk(c4, "a") == c4);
+  assert(strpbrk(c4, "ba") == c4);
+  assert(strpbrk(c4, "b") == c4 + 1);
+  assert(strpbrk(c4 + 2, "ab") == c4 + 7);
+  assert(strpbrk(c4 + 10, "zvkploabc") == NULL);
+
+  const char *n = "bonobobo";
+  assert(strstr(n, "") == n);
+  assert(strstr(n, "z") == NULL);
+  assert(strstr(n, "ba") == NULL);
+  assert(strstr(n, "boo") == NULL);
+  assert(strstr(n, "bo") == n);
+  assert(strstr(n + 1, "bo") == n + 4);
+  assert(strstr(n + 3, "bo") == n + 4);
+  assert(strstr(n + 4, "bo") == n + 4);
+  assert(strstr(n + 5, "bo") == n + 6);
+  assert(strstr(n, "bobo") == n + 4);
+  assert(strstr(n + 5, "bobo") == NULL);
+  assert(strstr(n, "bobobobo") == NULL);
+  assert(strstr(n, "bonobobo") == n);
+  assert(strstr(n, "onobobo") == n + 1);
 }
 
 int main() {
   test_memfuncs();
 
   test_strfuncs();
+
+  test_cmpfuncs();
 
   return 3;
 }
