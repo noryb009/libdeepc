@@ -159,12 +159,48 @@ void test_cmpfuncs() {
   assert(strstr(n, "onobobo") == n + 1);
 }
 
+void test_strtok() {
+  char a[] = "";
+  assert(strtok(a, " ") == NULL);
+  char b[] = "The quick, red dog. The cat.";
+  assert(strcmp(strtok(b, " ,."), "The") == 0);
+  assert(strcmp(strtok(NULL, " ,."), "quick") == 0);
+  assert(strcmp(strtok(NULL, " ,."), "red") == 0);
+  assert(strcmp(strtok(NULL, " ,."), "dog") == 0);
+  assert(strcmp(strtok(NULL, " ,."), "The") == 0);
+  assert(strcmp(strtok(NULL, " ,."), "cat") == 0);
+  assert(strtok(NULL, " ,.") == NULL);
+
+  char c[] = "     .. . a . .    . b . .  .";
+  assert(strcmp(strtok(c, " ,."), "a") == 0);
+  assert(strcmp(strtok(NULL, " ,."), "b") == 0);
+  assert(strtok(NULL, " ,.") == NULL);
+
+  char d[] = "aabaaccbb";
+  assert(strcmp(strtok(d, "a"), "b") == 0);
+  const char *dd = strtok(NULL, "c");
+  assert(strcmp(dd, "a") == 0);
+  assert(dd == d + 4);
+  assert(strcmp(strtok(NULL, "b"), "c") == 0);
+  assert(strcmp(strtok(NULL, ""), "b") == 0);
+  assert(strtok(NULL, "c") == NULL);
+
+  char e[] = "abcd";
+  assert(strtok(e, "edcba") == NULL);
+
+  char f[] = "abcd";
+  assert(strcmp(strtok(f, "f"), "abcd") == 0);
+  assert(strtok(NULL, "f") == NULL);
+}
+
 int main() {
   test_memfuncs();
 
   test_strfuncs();
 
   test_cmpfuncs();
+
+  test_strtok();
 
   return 3;
 }
