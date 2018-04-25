@@ -43,7 +43,7 @@ expect 2 ./argc a
 expect 0 ./stdint
 expect 0 ./stdarg
 expect 2 ./assert
-expectIO 1 "" $'Assert failure:\n  File: assert-fail.c\n  Func: main' ./assert-fail
+expectIO 1 "" $'Assert failure:\n  File: assert-fail.c\n  Func: main\n  Line: 4' ./assert-fail
 expect 3 ./string
 expect 5 ./strlen abcde
 expect 0 ./strlen ""
@@ -54,3 +54,4 @@ expectIO 0 "" $'abcd\nefgh' ./chario "abcd" "efgh"
 expectIO 0 $'abcd\nefgh' $'abcd\nefgh' ./echo
 expect 0 ./ctype
 expectIO 0 "" $'abc, defgh, i' ./printf
+expect 0 ./sprintf
