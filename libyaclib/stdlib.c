@@ -1,4 +1,5 @@
 #include "stdlib.h"
+#include "string.h"
 
 #define AT_EXIT_FUNCS 32
 
@@ -49,4 +50,70 @@ _Noreturn void abort() {
 _Noreturn void __stack_chk_fail() {
   // TODO: Output fail message.
   _Exit(42);
+}
+
+static void swap(void *a, void *b, size_t size) {
+  if (a == b) {
+    return;
+  }
+  unsigned char buf[size];
+  memcpy(buf, a, size);
+  memcpy(a, b, size);
+  memcpy(b, buf, size);
+}
+
+void qsort(void *ptr, size_t count, size_t size, int (*comp)(const void *, const void *)) {
+  unsigned char *arr = (unsigned char *)ptr;
+
+  if (count <= 1) {
+    return;
+  }
+
+  // Find partition value. We just use the last element.
+  // TODO: Pick a better element.
+  unsigned char *pivot = arr + ((count - 1) * size);
+  // Partition by the value.
+  unsigned char *right_side = arr;
+
+  for (unsigned char *i = arr; i < pivot; i += size) {
+    if (comp(i, pivot) < 0) {
+      // This item goes on the left side of the partition.
+      swap(i, right_side, size);
+      right_side += size;
+    }
+  }
+
+  // Insert the pivot to the left of the right side.
+  swap(right_side, pivot, size);
+  right_side += size;
+
+  // Recurse on both halves.
+  const size_t left_count = (right_side - arr) / size - 1;
+  qsort(arr, left_count, size, comp);
+  qsort(right_side, count - left_count - 1, size, comp);
+}
+
+void *bsearch(
+    const void *key,
+    const void *ptr,
+    const size_t count,
+    const size_t size,
+    int (*comp)(const void *, const void *)) {
+  const unsigned char *arr = (const void *)ptr;
+  size_t min = 0;
+  size_t max = count;
+
+  while (min < max) {
+    const size_t mid = (max - min) / 2 + min;
+    const unsigned char *mid_ptr = arr + (mid * size);
+    const int c = comp(mid_ptr, key);
+    if (c < 0) {
+      min = mid + 1;
+    } else if (c > 0) {
+      max = mid;
+    } else {
+      return (void *)mid_ptr;
+    }
+  }
+  return NULL;
 }

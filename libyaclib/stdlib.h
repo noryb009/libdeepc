@@ -33,3 +33,12 @@ long strtol(const char * restrict str, char ** restrict str_end, int base);
 long long strtoll(const char * restrict str, char ** restrict str_end, int base);
 unsigned long strtoul(const char * restrict str, char ** restrict str_end, int base);
 unsigned long long strtoull(const char * restrict str, char ** restrict str_end, int base);
+
+// Algorithms.
+void qsort(void *ptr, size_t count, size_t size, int (*comp)(const void *, const void *));
+void *bsearch(
+    const void *key,
+    const void *ptr,
+    size_t count,
+    size_t size,
+    int (*comp)(const void *, const void *));
