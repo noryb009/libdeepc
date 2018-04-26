@@ -24,3 +24,6 @@ char *strpbrk(const char *dest, const char *breakset);
 char *strstr(const char *str, const char *substr);
 char *strtok(char * restrict str, const char * restrict delim);
 char *strtok_r(char * restrict str, const char * restrict delim, char ** restrict state);
+
+char *strdup(const char *str);
+char *strndup(const char *str, size_t size);

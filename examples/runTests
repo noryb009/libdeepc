@@ -57,3 +57,4 @@ expectIO 0 "" $'abc, defgh, i' ./printf
 expect 0 ./sprintf
 expect 0 ./qsort
 expect 0 ./bsearch
+expect 0 ./strdup

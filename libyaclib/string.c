@@ -1,3 +1,4 @@
+#include "stdlib.h"
 #include "string.h"
 
 void *memchr(const void *ptr, int ch, size_t count) {
@@ -297,4 +298,23 @@ char *strtok_r(char * restrict str, const char * restrict delim, char ** restric
 
   // Return the token.
   return t;
+}
+
+char *strdup(const char *str) {
+  const size_t len = strlen(str) + 1;
+  char *new_str = malloc(len);
+  if (!new_str) {
+    return NULL;
+  }
+  return memcpy(new_str, str, len);
+}
+char *strndup(const char *str, const size_t size) {
+  const char *end = memchr(str, '\0', size);
+  const size_t len = (end == NULL) ? size : (end - str);
+  char *new_str = malloc(len + 1);
+  if (!new_str) {
+    return NULL;
+  }
+  new_str[len] = '\0';
+  return memcpy(new_str, str, len);
 }
