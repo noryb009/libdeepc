@@ -22,6 +22,8 @@ int main() {
   assert(strcmp(s, "+0012") == 0);
   sprintf(s, "%-4d", -12);
   assert(strcmp(s, "-12 ") == 0);
+  sprintf(s, "%+.0d", 0);
+  assert(strcmp(s, "+") == 0);
 
   sprintf(s, "%-6u", 1234);
   assert(strcmp(s, "1234  ") == 0);
@@ -40,6 +42,8 @@ int main() {
   assert(strcmp(s, "  001234") == 0);
   sprintf(s, "%#o", 0);
   assert(strcmp(s, "0") == 0);
+  sprintf(s, "%#.0o", 0);
+  assert(strcmp(s, "0") == 0);
 
   sprintf(s, "%7x", 0x12a4);
   assert(strcmp(s, "   12a4") == 0);
@@ -51,4 +55,12 @@ int main() {
   assert(strcmp(s, "0x012a4 ") == 0);
   sprintf(s, "%#8.6X", 0x12a4);
   assert(strcmp(s, "0X0012A4") == 0);
+  sprintf(s, "%#.0x", 0);
+  assert(strcmp(s, "") == 0);
+
+  sprintf(s, "[%c] [%3c] [%-5c] [%0c] [%1c] [%2c]", 'a', 'b', 'c', 'd', 'e', 'f');
+  assert(strcmp(s, "[a] [  b] [c    ] [d] [e] [ f]") == 0);
+
+  sprintf(s, "[%s] [%3s] [%-5s] [%0s] [%1s] [%1s] [%2s]", "abc", "de", "f", "ghi", "", "j", "k");
+  assert(strcmp(s, "[abc] [ de] [f    ] [ghi] [ ] [j] [ k]") == 0);
 }

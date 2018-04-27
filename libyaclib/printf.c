@@ -113,7 +113,7 @@ typedef struct {
 
   // Conversion specifier.
   VPRINTF_CONV conv;
-} vprint_state;
+} vprint_spec;
 
 #define LOG_T(n, base) \
   do { \
@@ -162,7 +162,7 @@ typedef struct {
   };
 } vprint_int;
 
-void write_number(vprintf_info *info, vprint_int val, vprint_state *s) {
+void write_number(vprintf_info *info, vprint_int val, vprint_spec *s) {
   const int buf_len = 32;
   // We calculate digits in reverse order, since it's easier.
   // We place them into this buffer, then output the buffer at the end.
@@ -197,12 +197,13 @@ void write_number(vprintf_info *info, vprint_int val, vprint_state *s) {
       T_LOOP(val.unsigned_int, 16, ((n < 10) ? (n + '0') : (n + 'A' - 10)));
       break;
   }
+#undef T_LOOP
   const int output_len = buf_len - cur;
   info->write_fn(info, buf + cur, output_len);
 }
 
-static void vprintf_output_int(vprintf_info *info, const vprint_int val, vprint_state *s) {
-  // Figure out some info from the state.
+static void vprintf_output_int(vprintf_info *info, vprint_spec *s, const vprint_int val) {
+  // Figure out some info from the spec.
   int min_precision = s->precision_set ? s->precision : 1;
   const int min_width = s->width_set ? s->width : 0;
 
@@ -228,12 +229,11 @@ static void vprintf_output_int(vprintf_info *info, const vprint_int val, vprint_
       num_precision = log10_uintmax(val.unsigned_int);
       break;
     case CONV_x:
-      num_precision = log16_uintmax(val.unsigned_int);
-      prefix = (s->flag_number ? "0x" : "");
-      break;
     case CONV_X:
       num_precision = log16_uintmax(val.unsigned_int);
-      prefix = (s->flag_number ? "0X" : "");
+      if (s->flag_number && num_precision != 0) {
+        prefix = (s->conv == CONV_x) ? "0x" : "0X";
+      }
       break;
     default:
       abort();
@@ -291,9 +291,7 @@ static void vprintf_output_int(vprintf_info *info, const vprint_int val, vprint_
 }
 
 // TODO: Split this function up into helpers.
-static void vprintf_percent(vprintf_info *info, const char * restrict * restrict format, va_list args) {
-  vprint_state state = {0};
-
+static void vprintf_parse_spec(vprintf_info *info, vprint_spec *spec, const char * restrict * restrict format, va_list args) {
   for (int stage = 0; stage < 5; /* Updated inside. */) {
     const char c = **format;
     if (c == '\0') {
@@ -307,19 +305,19 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
     if (stage == 0) {
       switch (c) {
         case '-':
-          state.flag_minus = 1;
+          spec->flag_minus = 1;
           break;
         case '+':
-          state.flag_plus = 1;
+          spec->flag_plus = 1;
           break;
         case ' ':
-          state.flag_space = 1;
+          spec->flag_space = 1;
           break;
         case '0':
-          state.flag_zero = 1;
+          spec->flag_zero = 1;
           break;
         case '#':
-          state.flag_number = 1;
+          spec->flag_number = 1;
           break;
         default:
           // Done this stage.
@@ -330,18 +328,18 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
     // Width.
     if (stage == 1) {
       if (c == '*') {
-        state.width = va_arg(args, int);
-        state.width_set = true;
-        if (state.width < 0) {
-          state.flag_minus = 1;
-          state.width = -state.width;
+        spec->width = va_arg(args, int);
+        spec->width_set = true;
+        if (spec->width < 0) {
+          spec->flag_minus = 1;
+          spec->width = -spec->width;
         }
 
         // Read next char and continue with the next stage.
         ++stage;
         continue;
       } else if ('1' <= c && c <= '9') {
-        state.width_set = true;
+        spec->width_set = true;
 
         // Unread the first digit.
         --(*format);
@@ -353,7 +351,7 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
           info->rc = ERR;
           return;
         }
-        state.width = precision;
+        spec->width = precision;
 
         // Read next char and continue with the next stage.
         ++stage;
@@ -367,15 +365,15 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
     // Precision.
     if (stage == 2) {
       if (c == '.') {
-        state.precision_set = true;
+        spec->precision_set = true;
         const char next = **format;
         if (next == '*') {
           // Skip the star.
           ++(*format);
-          state.precision = va_arg(args, int);
-          if (state.precision < 0) {
+          spec->precision = va_arg(args, int);
+          if (spec->precision < 0) {
             // As if nothing was specified.
-            state.precision_set = false;
+            spec->precision_set = false;
           }
         } else if ('0' <= next && next <= '9') {
           // Don't decrease format, since it points to the period.
@@ -387,9 +385,9 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
             info->rc = ERR;
             return;
           }
-          state.precision = width;
+          spec->precision = width;
         } else {
-          state.precision = 0;
+          spec->precision = 0;
         }
         // Read next char and continue with the next stage.
         ++stage;
@@ -407,30 +405,30 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
         case 'h':
           if (**format == 'h') {
             ++(*format);
-            state.length = LENGTH_hh;
+            spec->length = LENGTH_hh;
           } else {
-            state.length = LENGTH_h;
+            spec->length = LENGTH_h;
           }
           continue;
         case 'l':
           if (**format == 'l') {
             ++(*format);
-            state.conv = LENGTH_ll;
+            spec->conv = LENGTH_ll;
           } else {
-            state.conv = LENGTH_l;
+            spec->conv = LENGTH_l;
           }
           continue;
         case 'j':
-          state.conv = LENGTH_j;
+          spec->conv = LENGTH_j;
           continue;
         case 'z':
-          state.conv = LENGTH_z;
+          spec->conv = LENGTH_z;
           continue;
         case 't':
-          state.conv = LENGTH_t;
+          spec->conv = LENGTH_t;
           continue;
         case 'L':
-          state.conv = LENGTH_L;
+          spec->conv = LENGTH_L;
           continue;
         default:
           // Nothing, skip this stage.
@@ -443,197 +441,230 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
       // Last stage, we need to find one (and only one) character.
       ++stage;
 
+      VPRINTF_CONV conv;
       switch (c) {
         case 'd':
         case 'i':
-          state.conv = CONV_d;
+          conv = CONV_d;
           break;
         case 'o':
-          state.conv = CONV_o;
+          conv = CONV_o;
           break;
         case 'u':
-          state.conv = CONV_u;
+          conv = CONV_u;
           break;
         case 'x':
-          state.conv = CONV_x;
+          conv = CONV_x;
           break;
         case 'X':
-          state.conv = CONV_X;
+          conv = CONV_X;
           break;
         case 'c':
-          state.conv = CONV_c;
+          conv = CONV_c;
           break;
         case 's':
-          state.conv = CONV_s;
+          conv = CONV_s;
           break;
         case 'P':
-          state.conv = CONV_p;
+          conv = CONV_p;
           break;
         case 'n':
-          state.conv = CONV_n;
+          conv = CONV_n;
           break;
         case '%':
-          state.conv = CONV_percent;
+          conv = CONV_percent;
           break;
         default:
           errno = EINVAL;
           info->rc = ERR;
           return;
       }
+      spec->conv = conv;
     }
   }
+}
 
-  // Parse the state we've created.
-  switch (state.conv) {
+static vprint_int vprintf_conv_signed(VPRINTF_LENGTH len, va_list args) {
+  vprint_int n;
+  switch (len) {
+    case LENGTH_hh:
+      n.signed_int = (signed char)va_arg(args, int);
+      break;
+    case LENGTH_h:
+      n.signed_int = (short)va_arg(args, int);
+      break;
+    case LENGTH_l:
+      n.signed_int = va_arg(args, long);
+      break;
+    case LENGTH_ll:
+      n.signed_int = va_arg(args, long long);
+      break;
+    case LENGTH_j:
+      n.signed_int = va_arg(args, intmax_t);
+      break;
+    case LENGTH_z:
+      n.signed_int = va_arg(args, ssize_t);
+      break;
+    case LENGTH_t:
+      n.signed_int = va_arg(args, ptrdiff_t);
+      break;
+    case LENGTH_NONE:
+    case LENGTH_L:
+      n.signed_int = va_arg(args, int);
+      break;
+  }
+  return n;
+}
+
+static vprint_int vprintf_conv_unsigned(VPRINTF_LENGTH len, va_list args) {
+  vprint_int n;
+  switch (len) {
+    case LENGTH_hh:
+      n.unsigned_int = (unsigned char)va_arg(args, unsigned int);
+      break;
+    case LENGTH_h:
+      n.unsigned_int = (unsigned short)va_arg(args, unsigned int);
+      break;
+    case LENGTH_l:
+      n.unsigned_int = va_arg(args, unsigned long);
+      break;
+    case LENGTH_ll:
+      n.unsigned_int = va_arg(args, unsigned long long);
+      break;
+    case LENGTH_j:
+      n.unsigned_int = va_arg(args, uintmax_t);
+      break;
+    case LENGTH_z:
+      n.unsigned_int = va_arg(args, size_t);
+      break;
+    case LENGTH_t:
+      n.unsigned_int = va_arg(args, size_t);
+      break;
+    case LENGTH_NONE:
+    case LENGTH_L:
+      n.unsigned_int = va_arg(args, unsigned int);
+      break;
+  }
+  return n;
+}
+
+static void vprintf_conv_percent(vprintf_info *info, const unsigned char c) {
+  info->write_fn(info, &c, 1);
+}
+
+static void vprintf_conv_c(vprintf_info *info, vprint_spec *spec, const unsigned char c) {
+  const bool has_padding = spec->width_set && spec->width > 1;
+  if (has_padding) {
+    if (!spec->flag_minus) {
+      vprintf_padding(info, ' ', spec->width - 1);
+    }
+    info->write_fn(info, &c, 1);
+    if (spec->flag_minus) {
+      vprintf_padding(info, ' ', spec->width - 1);
+    }
+  } else {
+    info->write_fn(info, &c, 1);
+  }
+}
+
+static void vprintf_conv_s(vprintf_info *info, vprint_spec *spec, const char * restrict str) {
+  const size_t str_len = strlen(str);
+  const size_t len =
+    (spec->precision_set && (spec->precision < str_len)
+     ? spec->precision
+     : str_len);
+
+  const bool has_padding = spec->width_set && spec->width > len;
+  if (has_padding) {
+    if (!spec->flag_minus) {
+      vprintf_padding(info, ' ', spec->width - len);
+    }
+    info->write_fn(info, str, len);
+    if (spec->flag_minus) {
+      vprintf_padding(info, ' ', spec->width - len);
+    }
+  } else {
+    info->write_fn(info, str, len);
+  }
+}
+
+static void vprintf_conv_p(vprintf_info *info, void *ptr) {
+  // We either output "(nil)" or "0x1234".
+  if (ptr == NULL) {
+    info->write_fn(info, "(nil)", 5);
+    return;
+  }
+
+  // Create a spec to output '0x1234'.
+  vprint_spec spec = {0};
+  spec.flag_number = 1;
+  spec.conv = CONV_x;
+  // TODO: Copy any other flags?
+
+  vprint_int n;
+  n.unsigned_int = (uintmax_t)ptr;
+  vprintf_output_int(info, &spec, n);
+}
+
+static void vprintf_conv_n(VPRINTF_LENGTH len, void *s, size_t written) {
+  switch (len) {
+    case LENGTH_hh:
+      *((signed char *)s) = written;
+      break;
+    case LENGTH_h:
+      *((short *)s) = written;
+      break;
+    case LENGTH_l:
+      *((long *)s) = written;
+      break;
+    case LENGTH_ll:
+      *((long long *)s) = written;
+      break;
+    case LENGTH_j:
+      *((intmax_t *)s) = written;
+      break;
+    case LENGTH_z:
+      *((ssize_t *)s) = written;
+      break;
+    case LENGTH_t:
+      *((ptrdiff_t *)s) = written;
+      break;
+    case LENGTH_NONE:
+    case LENGTH_L:
+      *((int *)s) = written;
+      break;
+  }
+}
+
+static void vprintf_write_spec(vprintf_info *info, vprint_spec *spec, va_list args) {
+  // Parse the spec we've created.
+  switch (spec->conv) {
     case CONV_percent:
       {
-        const char c = '%';
+        unsigned char c = '%';
         info->write_fn(info, &c, 1);
       }
       break;
     case CONV_c:
-      {
-        const unsigned char c = (unsigned char)va_arg(args, int);
-        info->write_fn(info, &c, 1);
-      }
+      vprintf_conv_c(info, spec, (unsigned char)va_arg(args, int));
       break;
     case CONV_s:
-      {
-        const char *s = va_arg(args, const char *);
-        const size_t str_len = strlen(s);
-        const size_t len =
-          (state.precision_set && (state.precision < str_len)
-           ? state.precision
-           : str_len);
-        info->write_fn(info, s, len);
-      }
+      vprintf_conv_s(info, spec, va_arg(args, const char *));
       break;
     case CONV_d:
-      {
-        vprint_int m;
-        switch (state.length) {
-          case LENGTH_hh:
-            m.signed_int = (signed char)va_arg(args, int);
-            break;
-          case LENGTH_h:
-            m.signed_int = (short)va_arg(args, int);
-            break;
-          case LENGTH_l:
-            m.signed_int = va_arg(args, long);
-            break;
-          case LENGTH_ll:
-            m.signed_int = va_arg(args, long long);
-            break;
-          case LENGTH_j:
-            m.signed_int = va_arg(args, intmax_t);
-            break;
-          case LENGTH_z:
-            m.signed_int = va_arg(args, ssize_t);
-            break;
-          case LENGTH_t:
-            m.signed_int = va_arg(args, ptrdiff_t);
-            break;
-          case LENGTH_NONE:
-          case LENGTH_L:
-            m.signed_int = va_arg(args, int);
-            break;
-        }
-        vprintf_output_int(info, m, &state);
-      }
+      vprintf_output_int(info, spec, vprintf_conv_signed(spec->length, args));
       break;
     case CONV_o:
     case CONV_u:
     case CONV_x:
     case CONV_X:
-      {
-        vprint_int m;
-        switch (state.length) {
-          case LENGTH_hh:
-            m.unsigned_int = (unsigned char)va_arg(args, unsigned int);
-            break;
-          case LENGTH_h:
-            m.unsigned_int = (unsigned short)va_arg(args, unsigned int);
-            break;
-          case LENGTH_l:
-            m.unsigned_int = va_arg(args, unsigned long);
-            break;
-          case LENGTH_ll:
-            m.unsigned_int = va_arg(args, unsigned long long);
-            break;
-          case LENGTH_j:
-            m.unsigned_int = va_arg(args, uintmax_t);
-            break;
-          case LENGTH_z:
-            m.unsigned_int = va_arg(args, size_t);
-            break;
-          case LENGTH_t:
-            m.unsigned_int = va_arg(args, size_t);
-            break;
-          case LENGTH_NONE:
-          case LENGTH_L:
-            m.unsigned_int = va_arg(args, unsigned int);
-            break;
-        }
-        vprintf_output_int(info, m, &state);
-      }
+      vprintf_output_int(info, spec, vprintf_conv_unsigned(spec->length, args));
       break;
     case CONV_p:
-      {
-        const void *s = va_arg(args, void *);
-        // We either output "(nil)" or "0x1234".
-
-        if (s == NULL) {
-          info->write_fn(info, "(nil)", 5);
-          break;
-        }
-
-        // Set the state to output '0x1234'.
-        state.flag_minus = 0;
-        state.flag_plus = 0;
-        state.flag_space = 0;
-        state.flag_zero = 0;
-        state.flag_number = 1;
-        state.conv = CONV_x;
-        state.precision_set = false;
-        state.width_set = false;
-
-
-        vprint_int m;
-        m.unsigned_int = (uintmax_t)s;
-        vprintf_output_int(info, m, &state);
-      }
+      vprintf_conv_p(info, va_arg(args, void *));
       break;
     case CONV_n:
-      {
-        void *s = va_arg(args, void *);
-        switch (state.length) {
-          case LENGTH_hh:
-            *((signed char *)s) = info->written;
-            break;
-          case LENGTH_h:
-            *((short *)s) = info->written;
-            break;
-          case LENGTH_l:
-            *((long *)s) = info->written;
-            break;
-          case LENGTH_ll:
-            *((long long *)s) = info->written;
-            break;
-          case LENGTH_j:
-            *((intmax_t *)s) = info->written;
-            break;
-          case LENGTH_z:
-            *((ssize_t *)s) = info->written;
-            break;
-          case LENGTH_t:
-            *((ptrdiff_t *)s) = info->written;
-            break;
-          case LENGTH_NONE:
-          case LENGTH_L:
-            *((int *)s) = info->written;
-            break;
-        }
-      }
+      vprintf_conv_n(spec->length, va_arg(args, void *), info->written);
       break;
   }
 }
@@ -656,7 +687,13 @@ static int vprintf_shared(vprintf_info *info, const char * restrict format, va_l
           }
         }
         ++format;
-        vprintf_percent(info, &format, args);
+
+        vprint_spec spec = {0};
+        vprintf_parse_spec(info, &spec, &format, args);
+        if (info->rc != OK) {
+          break;
+        }
+        vprintf_write_spec(info, &spec, args);
         if (info->rc != OK) {
           break;
         }
