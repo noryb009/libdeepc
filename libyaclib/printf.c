@@ -115,20 +115,28 @@ typedef struct {
   VPRINTF_CONV conv;
 } vprint_state;
 
-#define LOG10_T() \
+#define LOG_T(n, base) \
+  do { \
     int l = 0; \
-    for (; n != 0; ++l) { \
-      n /= 10; \
+    for (; (n) != 0; ++l) { \
+      (n) /= (base); \
     } \
-    return l;
+    return l; \
+  } while (false)
 
 static int log10_intmax(intmax_t n) {
-  LOG10_T()
+  LOG_T(n, 10);
+}
+static int log8_uintmax(uintmax_t n) {
+  LOG_T(n, 8);
 }
 static int log10_uintmax(uintmax_t n) {
-  LOG10_T()
+  LOG_T(n, 10);
 }
-#undef LOG10_T
+static int log16_uintmax(uintmax_t n) {
+  LOG_T(n, 16);
+}
+#undef LOG_T
 
 static void vprintf_padding(vprintf_info *info, const char p, int len) {
   if (len <= 0) {
@@ -147,23 +155,100 @@ static void vprintf_padding(vprintf_info *info, const char p, int len) {
   }
 }
 
-static void vprintf_output_int(vprintf_info *info, intmax_t val, vprint_state *s) {
+typedef struct {
+  union {
+    uintmax_t unsigned_int;
+    intmax_t signed_int;
+  };
+} vprint_int;
+
+void write_number(vprintf_info *info, vprint_int val, vprint_state *s) {
+  const int buf_len = 32;
+  // We calculate digits in reverse order, since it's easier.
+  // We place them into this buffer, then output the buffer at the end.
+  char buf[buf_len];
+  // Make sure the buffer can hold anything (with spare room).
+  static_assert(UINTMAX_MAX == UINT64_MAX, "intmax_t too big for printf");
+
+#define T_LOOP(src, base, n_fn) \
+  do { \
+    while ((src) != 0) { \
+      const int n = (src) % (base); \
+      (src) /= (base); \
+      buf[--cur] = n_fn; \
+    } \
+  } while (false)
+
+  int cur = buf_len;
+  switch (s->conv) {
+    case CONV_d:
+      T_LOOP(val.signed_int, 10, (n < 0 ? -n : n) + '0');
+      break;
+    case CONV_o:
+      T_LOOP(val.unsigned_int, 8, n + '0');
+      break;
+    case CONV_u:
+      T_LOOP(val.unsigned_int, 10, n + '0');
+      break;
+    case CONV_x:
+      T_LOOP(val.unsigned_int, 16, ((n < 10) ? (n + '0') : (n + 'a' - 10)));
+      break;
+    case CONV_X:
+      T_LOOP(val.unsigned_int, 16, ((n < 10) ? (n + '0') : (n + 'A' - 10)));
+      break;
+  }
+  const int output_len = buf_len - cur;
+  info->write_fn(info, buf + cur, output_len);
+}
+
+static void vprintf_output_int(vprintf_info *info, const vprint_int val, vprint_state *s) {
   // Figure out some info from the state.
-  const int min_precision = s->precision_set ? s->precision : 1;
+  int min_precision = s->precision_set ? s->precision : 1;
   const int min_width = s->width_set ? s->width : 0;
-  const char * const sign = (val < 0) ? "-" : (s->flag_plus ? "+" : (s->flag_space ? " " : ""));
-  const int sign_len = (*sign == '\0') ? 0 : 1;
 
   // Figure out the precision.
-  const int num_precision = log10_intmax(val);
+  int num_precision;
+  const char *prefix = "";
+  switch (s->conv) {
+    case CONV_d:
+      num_precision = log10_intmax(val.signed_int);
+      prefix = ((val.signed_int < 0) ? "-" : (s->flag_plus ? "+" : (s->flag_space ? " " : "")));
+      break;
+    case CONV_o:
+      num_precision = log8_uintmax(val.unsigned_int);
+      if (s->flag_number) {
+        // This would normally make the prefix "0", but that 0 is supposed to
+        // count towards the precision. Instead, we adjust the precision.
+        if (min_precision <= num_precision) {
+          min_precision = num_precision + 1;
+        }
+      }
+      break;
+    case CONV_u:
+      num_precision = log10_uintmax(val.unsigned_int);
+      break;
+    case CONV_x:
+      num_precision = log16_uintmax(val.unsigned_int);
+      prefix = (s->flag_number ? "0x" : "");
+      break;
+    case CONV_X:
+      num_precision = log16_uintmax(val.unsigned_int);
+      prefix = (s->flag_number ? "0X" : "");
+      break;
+    default:
+      abort();
+  }
+  const size_t prefix_len = strlen(prefix);
+
   int precision = (num_precision > min_precision ? num_precision : min_precision);
   if ((s->flag_zero && !s->precision_set && !s->flag_minus) && min_width > precision) {
-    // The entire width (except the sign) should be filled with 0s.
-    precision = min_width - sign_len;
+    // The entire width (except the prefix) should be filled with 0s.
+    precision = min_width - prefix_len;
   }
   
   // Figure out the padding length.
-  const int space_padding_len = (min_width < precision + sign_len) ? 0 : (min_width - precision - sign_len);
+  const size_t total_size = precision + prefix_len;
+  const size_t space_padding_len = (min_width <= total_size) ? 0 : (min_width - total_size);
 
   // Beginning padding.
   if (!s->flag_minus) {
@@ -173,8 +258,8 @@ static void vprintf_output_int(vprintf_info *info, intmax_t val, vprint_state *s
     }
   }
 
-  if (sign_len) {
-    info->write_fn(info, sign, 1);
+  if (prefix_len) {
+    info->write_fn(info, prefix, prefix_len);
     if (info->rc != OK) {
       return;
     }
@@ -190,27 +275,10 @@ static void vprintf_output_int(vprintf_info *info, intmax_t val, vprint_state *s
   }
 
   // Output actual number.
-  {
-    const int buf_len = 32;
-    // We calculate digits in reverse order, since it's easier.
-    // We place them into this buffer, then output the buffer at the end.
-    char buf[buf_len];
-    // Make sure the buffer can hold anything (with spare room).
-    static_assert(UINTMAX_MAX == UINT64_MAX, "intmax_t too big for printf");
-
-    int cur = buf_len;
-    while (val != 0) {
-      const int n = val % 10;
-      val /= 10;
-      const int n_abs = (n < 0 ? -n : n);
-      --cur;
-      buf[cur] = n_abs + '0';
-    }
-    const int output_len = buf_len - cur;
-    info->write_fn(info, buf + cur, output_len);
-    if (info->rc != OK) {
-      return;
-    }
+  write_number(info, val, s);
+  // TODO
+  if (info->rc != OK) {
+    return;
   }
 
   // End padding.
@@ -220,11 +288,6 @@ static void vprintf_output_int(vprintf_info *info, intmax_t val, vprint_state *s
       return;
     }
   }
-}
-
-static void vprintf_output_uint(vprintf_info *info, uintmax_t val, vprint_state *s) {
-  // TODO
-  return;
 }
 
 // TODO: Split this function up into helpers.
@@ -273,6 +336,10 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
           state.flag_minus = 1;
           state.width = -state.width;
         }
+
+        // Read next char and continue with the next stage.
+        ++stage;
+        continue;
       } else if ('1' <= c && c <= '9') {
         state.width_set = true;
 
@@ -287,6 +354,10 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
           return;
         }
         state.width = precision;
+
+        // Read next char and continue with the next stage.
+        ++stage;
+        continue;
       } else {
         // Skip this stage.
         ++stage;
@@ -320,6 +391,9 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
         } else {
           state.precision = 0;
         }
+        // Read next char and continue with the next stage.
+        ++stage;
+        continue;
       } else {
         // Skip this stage.
         ++stage;
@@ -328,6 +402,7 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
 
     // Length modifer.
     if (stage == 3) {
+      ++stage;
       switch (c) {
         case 'h':
           if (**format == 'h') {
@@ -336,7 +411,7 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
           } else {
             state.length = LENGTH_h;
           }
-          break;
+          continue;
         case 'l':
           if (**format == 'l') {
             ++(*format);
@@ -344,22 +419,22 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
           } else {
             state.conv = LENGTH_l;
           }
-          break;
+          continue;
         case 'j':
           state.conv = LENGTH_j;
-          break;
+          continue;
         case 'z':
           state.conv = LENGTH_z;
-          break;
+          continue;
         case 't':
           state.conv = LENGTH_t;
-          break;
+          continue;
         case 'L':
           state.conv = LENGTH_L;
-          break;
+          continue;
         default:
-          // Skip this stage.
-          ++stage;
+          // Nothing, skip this stage.
+          break;
       }
     }
 
@@ -435,32 +510,32 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
       break;
     case CONV_d:
       {
-        intmax_t m;
+        vprint_int m;
         switch (state.length) {
           case LENGTH_hh:
-            m = (signed char)va_arg(args, int);
+            m.signed_int = (signed char)va_arg(args, int);
             break;
           case LENGTH_h:
-            m = (short)va_arg(args, int);
+            m.signed_int = (short)va_arg(args, int);
             break;
           case LENGTH_l:
-            m = va_arg(args, long);
+            m.signed_int = va_arg(args, long);
             break;
           case LENGTH_ll:
-            m = va_arg(args, long long);
+            m.signed_int = va_arg(args, long long);
             break;
           case LENGTH_j:
-            m = va_arg(args, intmax_t);
+            m.signed_int = va_arg(args, intmax_t);
             break;
           case LENGTH_z:
-            m = va_arg(args, ssize_t);
+            m.signed_int = va_arg(args, ssize_t);
             break;
           case LENGTH_t:
-            m = va_arg(args, ptrdiff_t);
+            m.signed_int = va_arg(args, ptrdiff_t);
             break;
           case LENGTH_NONE:
           case LENGTH_L:
-            m = va_arg(args, int);
+            m.signed_int = va_arg(args, int);
             break;
         }
         vprintf_output_int(info, m, &state);
@@ -471,35 +546,35 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
     case CONV_x:
     case CONV_X:
       {
-        uintmax_t m;
+        vprint_int m;
         switch (state.length) {
           case LENGTH_hh:
-            m = (unsigned char)va_arg(args, unsigned int);
+            m.unsigned_int = (unsigned char)va_arg(args, unsigned int);
             break;
           case LENGTH_h:
-            m = (unsigned short)va_arg(args, unsigned int);
+            m.unsigned_int = (unsigned short)va_arg(args, unsigned int);
             break;
           case LENGTH_l:
-            m = va_arg(args, unsigned long);
+            m.unsigned_int = va_arg(args, unsigned long);
             break;
           case LENGTH_ll:
-            m = va_arg(args, unsigned long long);
+            m.unsigned_int = va_arg(args, unsigned long long);
             break;
           case LENGTH_j:
-            m = va_arg(args, uintmax_t);
+            m.unsigned_int = va_arg(args, uintmax_t);
             break;
           case LENGTH_z:
-            m = va_arg(args, size_t);
+            m.unsigned_int = va_arg(args, size_t);
             break;
           case LENGTH_t:
-            m = va_arg(args, size_t);
+            m.unsigned_int = va_arg(args, size_t);
             break;
           case LENGTH_NONE:
           case LENGTH_L:
-            m = va_arg(args, unsigned int);
+            m.unsigned_int = va_arg(args, unsigned int);
             break;
         }
-        vprintf_output_uint(info, m, &state);
+        vprintf_output_int(info, m, &state);
       }
       break;
     case CONV_p:
@@ -522,8 +597,10 @@ static void vprintf_percent(vprintf_info *info, const char * restrict * restrict
         state.precision_set = false;
         state.width_set = false;
 
-        const uintmax_t s2 = (uintmax_t)s;
-        vprintf_output_uint(info, s2, &state);
+
+        vprint_int m;
+        m.unsigned_int = (uintmax_t)s;
+        vprintf_output_int(info, m, &state);
       }
       break;
     case CONV_n:
@@ -584,6 +661,7 @@ static int vprintf_shared(vprintf_info *info, const char * restrict format, va_l
           break;
         }
         start_literal = format;
+        break;
       default:
         // Next input char, this will be output later using start_literal.
         ++format;

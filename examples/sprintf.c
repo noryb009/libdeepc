@@ -22,4 +22,33 @@ int main() {
   assert(strcmp(s, "+0012") == 0);
   sprintf(s, "%-4d", -12);
   assert(strcmp(s, "-12 ") == 0);
+
+  sprintf(s, "%-6u", 1234);
+  assert(strcmp(s, "1234  ") == 0);
+  sprintf(s, "%7.5u", 1234);
+  assert(strcmp(s, "  01234") == 0);
+
+  sprintf(s, "%7.5o", 01234);
+  assert(strcmp(s, "  01234") == 0);
+  sprintf(s, "%#7o", 01234);
+  assert(strcmp(s, "  01234") == 0);
+  sprintf(s, "%#07o", 01234);
+  assert(strcmp(s, "0001234") == 0);
+  sprintf(s, "%#8.5o", 01234);
+  assert(strcmp(s, "   01234") == 0);
+  sprintf(s, "%#8.6o", 01234);
+  assert(strcmp(s, "  001234") == 0);
+  sprintf(s, "%#o", 0);
+  assert(strcmp(s, "0") == 0);
+
+  sprintf(s, "%7x", 0x12a4);
+  assert(strcmp(s, "   12a4") == 0);
+  sprintf(s, "%#7X", 0x12a4);
+  assert(strcmp(s, " 0X12A4") == 0);
+  sprintf(s, "%#07x", 0x12a4);
+  assert(strcmp(s, "0x012a4") == 0);
+  sprintf(s, "%-#8.5x", 0x12a4);
+  assert(strcmp(s, "0x012a4 ") == 0);
+  sprintf(s, "%#8.6X", 0x12a4);
+  assert(strcmp(s, "0X0012A4") == 0);
 }
