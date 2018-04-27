@@ -1,7 +1,7 @@
-#include "stdbool.h"
-#include "stdio.h"
-#include "string.h"
-#include "unistd.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 static FILE stdin_obj = {0, false, 0, 0};
 static FILE stdout_obj = {1, false, 0, 0};

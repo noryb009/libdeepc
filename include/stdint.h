@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stdinternaltypes.h"
+#include <stdinternaltypes.h>
 
 // NOTE: This is GCC-on-x86-64 specific.
 // TODO: #if's for choosing the correct size.

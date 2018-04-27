@@ -1,5 +1,6 @@
-libyaclib/*
+include/*
 examples/*
+src/*
 !*/Makefile
 !*/runTests
 !*/*.c

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "stdarg.h"
-#include "stddef.h"
+#include <stdarg.h>
+#include <stddef.h>
 
 #define EOF -1
 typedef size_t fpos_t;

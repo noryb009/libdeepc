@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stdinternaltypes.h"
+#include <stdinternaltypes.h>
 
 _Noreturn void __assert_failure();
 

@@ -1,5 +1,7 @@
-#include "stdlib.h"
-#include "string.h"
+#include <stdlib.h>
+#include <string.h>
+
+#include "syscall.h"
 
 #define AT_EXIT_FUNCS 32
 
@@ -41,6 +43,10 @@ _Noreturn void exit(int ret) {
 _Noreturn void quick_exit(int ret) {
   run_exit_funcs(at_quick_exit_funcs, cur_at_quick_exit_func);
   exit(ret);
+}
+
+_Noreturn void _Exit(int ret) {
+  __syscall1_noret(ret, SYS_EXIT);
 }
 
 _Noreturn void abort() {

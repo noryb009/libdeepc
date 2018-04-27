@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stddef.h"
+#include <stddef.h>
 
 void *memchr(const void *ptr, int ch, size_t count);
 int memcmp(const void *lhs, const void *rhs, size_t count);

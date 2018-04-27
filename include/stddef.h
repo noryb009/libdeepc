@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stdinternaltypes.h"
+#include <stdinternaltypes.h>
 
 typedef __size_t size_t;
 typedef __intptr_t ptrdiff_t;

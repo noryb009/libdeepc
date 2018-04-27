@@ -1,5 +1,5 @@
-#include "stdlib.h"
-#include "string.h"
+#include <stdlib.h>
+#include <string.h>
 
 void *memchr(const void *ptr, int ch, size_t count) {
   const unsigned char needle = (unsigned char)ch;

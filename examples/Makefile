@@ -2,7 +2,7 @@
 
 CC := gcc
 CFLAGS := -O0 -g
-COMMAND := $(CC) $(CFLAGS) -nostdlib -nostdinc -fno-builtin -I ../libyaclib/ -L ../libyaclib ../libyaclib/start.S
+COMMAND := $(CC) $(CFLAGS) -nostdlib -nostdinc -fno-builtin -I ../include/ -L ../src
 LIBS := -l:libyaclib.a
 
 single-file-tests = true false argc stdint stdarg assert assert-fail string strlen setjmp malloc chario echo ctype printf atoi sprintf qsort bsearch strdup
@@ -12,10 +12,10 @@ single-file-tests = true false argc stdint stdarg assert assert-fail string strl
 all: libyaclib $(single-file-tests)
 
 libyaclib:
-	cd ../libyaclib/ && make all
+	cd ../src/ && make all
 
 clean:
-	cd ../libyaclib && make clean
+	cd ../src && make clean
 	rm -f ${single-file-tests}
 
 define make-single-target

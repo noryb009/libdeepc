@@ -1,7 +1,7 @@
 #pragma once
 
-#include "stddef.h"
-#include "stdinternaltypes.h"
+#include <stddef.h>
+#include <stdinternaltypes.h>
 
 //Termination.
 #define EXIT_SUCCESS 0
@@ -14,7 +14,7 @@ int at_quick_exit(__atexit_func func);
 
 _Noreturn void exit(int ret);
 _Noreturn void quick_exit(int ret);
-_Noreturn void _Exit(int ret); // In unistd.c.
+_Noreturn void _Exit(int ret);
 _Noreturn void abort();
 
 // Memory management.
