@@ -63,4 +63,9 @@ int main() {
 
   sprintf(s, "[%s] [%3s] [%-5s] [%0s] [%1s] [%1s] [%2s]", "abc", "de", "f", "ghi", "", "j", "k");
   assert(strcmp(s, "[abc] [ de] [f    ] [ghi] [ ] [j] [ k]") == 0);
+
+  sprintf(s, "[%p] [%5p] [%-7.4p]", 0x1a, 0x2b, 0x3c);
+  assert(strcmp(s, "[0x1a] [ 0x2b] [0x003c ]") == 0);
+  sprintf(s, "[%p] [%8p] [%-7p]", NULL, NULL, NULL);
+  assert(strcmp(s, "[(nil)] [   (nil)] [(nil)  ]") == 0);
 }

@@ -465,7 +465,7 @@ static void vprintf_parse_spec(vprintf_info *info, vprint_spec *spec, const char
         case 's':
           conv = CONV_s;
           break;
-        case 'P':
+        case 'p':
           conv = CONV_p;
           break;
         case 'n':
@@ -588,22 +588,21 @@ static void vprintf_conv_s(vprintf_info *info, vprint_spec *spec, const char * r
   }
 }
 
-static void vprintf_conv_p(vprintf_info *info, void *ptr) {
+static void vprintf_conv_p(vprintf_info *info, vprint_spec *spec, void *ptr) {
   // We either output "(nil)" or "0x1234".
   if (ptr == NULL) {
-    info->write_fn(info, "(nil)", 5);
+    vprintf_conv_s(info, spec, "(nil)");
     return;
   }
 
   // Create a spec to output '0x1234'.
-  vprint_spec spec = {0};
-  spec.flag_number = 1;
-  spec.conv = CONV_x;
+  spec->flag_number = 1;
+  spec->conv = CONV_x;
   // TODO: Copy any other flags?
 
   vprint_int n;
   n.unsigned_int = (uintmax_t)ptr;
-  vprintf_output_int(info, &spec, n);
+  vprintf_output_int(info, spec, n);
 }
 
 static void vprintf_conv_n(VPRINTF_LENGTH len, void *s, size_t written) {
@@ -661,7 +660,7 @@ static void vprintf_write_spec(vprintf_info *info, vprint_spec *spec, va_list ar
       vprintf_output_int(info, spec, vprintf_conv_unsigned(spec->length, args));
       break;
     case CONV_p:
-      vprintf_conv_p(info, va_arg(args, void *));
+      vprintf_conv_p(info, spec, va_arg(args, void *));
       break;
     case CONV_n:
       vprintf_conv_n(spec->length, va_arg(args, void *), info->written);
