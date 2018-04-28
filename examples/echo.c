@@ -3,7 +3,7 @@
 
 int main() {
   for (;;) {
-    int ch = getchar();
+    const int ch = getchar();
     if (ch == EOF) {
       break;
     }

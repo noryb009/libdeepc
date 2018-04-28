@@ -8,6 +8,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "file.h"
+
 typedef enum {
   OK = 0,
   END = 1,
@@ -53,7 +55,7 @@ struct vprintf_info {
   write_fn_t write_fn;
 
   // If writing to a file, the file descriptor.
-  int fd;
+  FILE *file;
 
   // If writing to a string, the string and its length.
   char * restrict buffer;
@@ -65,7 +67,8 @@ static void write_fd(vprintf_info *info, const void *buf, const size_t size) {
     return;
   }
 
-  const ssize_t written = write(info->fd, buf, size);
+  // TODO: Use fwrite.
+  const ssize_t written = write(info->file->fd, buf, size);
   // Check for errors.
   if (written < 0) {
     errno = -written;
@@ -716,11 +719,15 @@ static int vprintf_shared(vprintf_info *info, const char * restrict format, va_l
   }
 }
 
-int vprintf(const char * restrict format, va_list args) {
+int vfprintf(FILE * restrict stream, const char * restrict format, va_list args) {
   vprintf_info info = {0};
   info.write_fn = write_fd;
-  info.fd = 1;
+  info.file = stream;
   return vprintf_shared(&info, format, args);
+}
+
+int vprintf(const char * restrict format, va_list args) {
+  return vfprintf(stdout, format, args);
 }
 
 int vsprintf(char * restrict buffer, const char * restrict format, va_list args) {
@@ -744,10 +751,18 @@ int vsnprintf(char * restrict buffer, size_t buf_size, const char * restrict for
   return ret;
 }
 
+int fprintf(FILE * restrict stream, const char * restrict format, ...) {
+  va_list args;
+  va_start(args, format);
+  int ret = vfprintf(stream, format, args);
+  va_end(args);
+  return ret;
+}
+
 int printf(const char * restrict format, ...) {
   va_list args;
   va_start(args, format);
-  int ret = vprintf(format, args);
+  int ret = vfprintf(stdout, format, args);
   va_end(args);
   return ret;
 }

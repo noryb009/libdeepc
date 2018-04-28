@@ -20,7 +20,7 @@ function expectIO() {
   shift
   output=$1
   shift
-  actual_output="$(echo -n "$input" | $@)"
+  actual_output="$(echo -n "$input" | $@ 2>&1)"
   actual=$?
   if [[ $expected -ne $actual ]]; then
     echo "Expected $expected, got $actual with program: $@"

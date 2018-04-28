@@ -3,7 +3,6 @@
 #include <stdlib.h>
 
 _Noreturn void __assert_failure(const char *file, size_t line, const char *func) {
-  // TODO: Output to stderr, not stdout.
-  printf("Assert failure:\n  File: %s\n  Func: %s\n  Line: %zu\n", file, func, line);
+  fprintf(stderr, "Assert failure:\n  File: %s\n  Func: %s\n  Line: %zu\n", file, func, line);
   abort();
 }
