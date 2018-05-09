@@ -53,7 +53,8 @@ _Noreturn void abort() {
   _Exit(1);
 }
 
-_Noreturn void __stack_chk_fail() {
+_Noreturn void __stack_chk_fail(void);
+_Noreturn void __stack_chk_fail(void) {
   // TODO: Output fail message.
   _Exit(42);
 }

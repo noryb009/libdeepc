@@ -76,7 +76,7 @@ static void write_fd(vprintf_info *info, const void *buf, const size_t size) {
     return;
   }
   info->written += written;
-  if (written < size) {
+  if ((size_t)written < size) {
     // Couldn't write everything, stop now.
     info->rc = END;
   }
@@ -165,7 +165,7 @@ typedef struct {
   };
 } vprint_int;
 
-void write_number(vprintf_info *info, vprint_int val, vprint_spec *s) {
+static void write_number(vprintf_info *info, vprint_int val, vprint_spec *s) {
   const int buf_len = 32;
   // We calculate digits in reverse order, since it's easier.
   // We place them into this buffer, then output the buffer at the end.
@@ -199,6 +199,12 @@ void write_number(vprintf_info *info, vprint_int val, vprint_spec *s) {
     case CONV_X:
       T_LOOP(val.unsigned_int, 16, ((n < 10) ? (n + '0') : (n + 'A' - 10)));
       break;
+    case CONV_c:
+    case CONV_s:
+    case CONV_p:
+    case CONV_n:
+    case CONV_percent:
+      abort();
   }
 #undef T_LOOP
   const int output_len = buf_len - cur;
@@ -251,7 +257,7 @@ static void vprintf_output_int(vprintf_info *info, vprint_spec *s, const vprint_
   
   // Figure out the padding length.
   const size_t total_size = precision + prefix_len;
-  const size_t space_padding_len = (min_width <= total_size) ? 0 : (min_width - total_size);
+  const size_t space_padding_len = (min_width < 0 || (size_t)min_width <= total_size) ? 0 : (min_width - total_size);
 
   // Beginning padding.
   if (!s->flag_minus) {
@@ -551,10 +557,6 @@ static vprint_int vprintf_conv_unsigned(VPRINTF_LENGTH len, va_list args) {
   return n;
 }
 
-static void vprintf_conv_percent(vprintf_info *info, const unsigned char c) {
-  info->write_fn(info, &c, 1);
-}
-
 static void vprintf_conv_c(vprintf_info *info, vprint_spec *spec, const unsigned char c) {
   const bool has_padding = spec->width_set && spec->width > 1;
   if (has_padding) {
@@ -573,11 +575,11 @@ static void vprintf_conv_c(vprintf_info *info, vprint_spec *spec, const unsigned
 static void vprintf_conv_s(vprintf_info *info, vprint_spec *spec, const char * restrict str) {
   const size_t str_len = strlen(str);
   const size_t len =
-    (spec->precision_set && (spec->precision < str_len)
-     ? spec->precision
+    ((spec->precision_set && spec->precision >= 0 && (size_t)spec->precision < str_len)
+     ? (size_t)spec->precision
      : str_len);
 
-  const bool has_padding = spec->width_set && spec->width > len;
+  const bool has_padding = spec->width_set && spec->width >= 0 && (size_t)spec->width > len;
   if (has_padding) {
     if (!spec->flag_minus) {
       vprintf_padding(info, ' ', spec->width - len);
@@ -715,8 +717,9 @@ static int vprintf_shared(vprintf_info *info, const char * restrict format, va_l
       return -1;
     case END:
     case OK:
-      return info->written;
+      break;
   }
+  return info->written;
 }
 
 int vfprintf(FILE * restrict stream, const char * restrict format, va_list args) {

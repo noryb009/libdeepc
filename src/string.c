@@ -310,7 +310,7 @@ char *strdup(const char *str) {
 }
 char *strndup(const char *str, const size_t size) {
   const char *end = memchr(str, '\0', size);
-  const size_t len = (end == NULL) ? size : (end - str);
+  const size_t len = (end == NULL) ? size : (size_t)(end - str);
   char *new_str = malloc(len + 1);
   if (!new_str) {
     return NULL;

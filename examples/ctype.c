@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <ctype.h>
 
-int main() {
+int main(void) {
   assert(islower('a'));
   assert(!islower('a'-1));
   assert(islower('z'));

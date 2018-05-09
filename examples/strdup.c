@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main() {
+int main(void) {
   const char *a = "abcdef";
   char *b = strdup(a);
   assert(a != b);

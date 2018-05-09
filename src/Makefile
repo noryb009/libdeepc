@@ -2,7 +2,8 @@
 
 CC := gcc
 CFLAGS := -O0 -g
-COMMAND := $(CC) $(CFLAGS) -nostdlib -nostdinc -fno-builtin -I ../include/
+WARNINGS := -pedantic -Wall -Wextra -Wshadow -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes
+COMMAND := $(CC) $(CFLAGS) $(WARNINGS) -nostdlib -nostdinc -fno-builtin -I ../include/
 
 OBJECTS = errno.o stdlib.o setjmp.o unistd.o syscall.o malloc.o string.o stdio.o ctype.o printf.o assert.o atoi.o start.o
 DEPENDS = ${OBJECTS:.o=.d}

@@ -1,6 +1,6 @@
 #include <stdarg.h>
 
-int sum(int count, ...) {
+static int sum(int count, ...) {
   va_list args;
   va_start(args, count);
   int sum = 0;
@@ -11,7 +11,7 @@ int sum(int count, ...) {
   return sum;
 }
 
-int main() {
+int main(void) {
   int a = 1, b = 2, c = 3, d = 5;
   // TODO: Use assert().
   if (sum(0) != 0)

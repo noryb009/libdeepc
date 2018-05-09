@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-int main() {
+int main(void) {
   for (;;) {
     const int ch = getchar();
     if (ch == EOF) {

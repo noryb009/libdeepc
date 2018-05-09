@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-int main() {
+int main(void) {
   // TODO: Use assert().
   int8_t i8;
   uint8_t u8;

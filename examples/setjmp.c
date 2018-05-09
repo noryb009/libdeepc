@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <setjmp.h>
 
-int run(volatile int *rep, jmp_buf buf, int ret) {
+static int run(volatile int *rep, jmp_buf buf, int ret) {
   assert(ret == *rep);
   if (ret < 5) {
     (*rep)++;
@@ -10,7 +10,7 @@ int run(volatile int *rep, jmp_buf buf, int ret) {
   return *rep;
 }
 
-int main() {
+int main(void) {
   volatile int rep = 0;
   jmp_buf buf;
   int ret = setjmp(buf);

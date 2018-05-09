@@ -110,7 +110,7 @@ char *fgets(char * const restrict str, int count, FILE * restrict stream) {
   return str;
 }
 
-int getchar() {
+int getchar(void) {
   return fgetc(stdin);
 }
 
@@ -130,7 +130,7 @@ int fputs(const char * restrict s, FILE * restrict stream) {
   const size_t len = strlen(s);
   {
     const ssize_t ret = fwrite(s, 1, len, stream);
-    if (ret < len) {
+    if (ret < 0 || (size_t)ret < len) {
       return EOF;
     }
   }

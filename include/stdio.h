@@ -24,7 +24,7 @@ size_t fwrite(const void * restrict buffer, size_t size, size_t count, FILE * re
 // Unformatted IO.
 int fgetc(FILE *stream);
 #define getc(s) fgetc(s)
-int getchar();
+int getchar(void);
 int fputc(int ch, FILE *stream);
 #define putc(c, s) fputc(c, s)
 int putchar(int c);

@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <string.h>
 
-void test_memfuncs() {
+static void test_memfuncs(void) {
   char *c = "abcdefghijklmnopqrstuvwxyz";
 
   assert(memchr(c, 'c', 26) == c + 2);
@@ -35,7 +35,7 @@ void test_memfuncs() {
   assert(memcmp(c2, "efghijghijklmnop", 16) == 0);
 }
 
-void test_strfuncs() {
+static void test_strfuncs(void) {
   assert(strlen("") == 0);
   assert(strlen("abc") == 3);
   assert(strlen("abcdef\0z") == 6);
@@ -75,7 +75,7 @@ void test_strfuncs() {
   assert(memcmp(c, "abcdefgh\0\0", 10) == 0);
 }
 
-void test_cmpfuncs() {
+static void test_cmpfuncs(void) {
   assert(strcmp("abc", "abc") == 0);
   assert(strcmp("aac", "abc") < 0);
   assert(strcmp("acc", "abc") > 0);
@@ -159,7 +159,7 @@ void test_cmpfuncs() {
   assert(strstr(n, "onobobo") == n + 1);
 }
 
-void test_strtok() {
+static void test_strtok(void) {
   char a[] = "";
   assert(strtok(a, " ") == NULL);
   char b[] = "The quick, red dog. The cat.";
@@ -193,7 +193,7 @@ void test_strtok() {
   assert(strtok(NULL, "f") == NULL);
 }
 
-int main() {
+int main(void) {
   test_memfuncs();
 
   test_strfuncs();

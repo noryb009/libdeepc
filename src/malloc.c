@@ -73,6 +73,7 @@ void *calloc(size_t num, size_t size) {
 }
 
 void *aligned_alloc(size_t alignment, size_t size) {
-  // TODO
-  return NULL;
+  (void)alignment;
+  // TODO: Actual alignment.
+  return malloc(size);
 }

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main(int argc, char **argv) {
+int main(void) {
   assert(malloc(0) == NULL);
   assert(realloc(NULL, 0) == NULL);
   free(NULL);

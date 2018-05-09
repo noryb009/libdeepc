@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main() {
+int main(void) {
   assert(snprintf(NULL, 0, "abc%sgh\n", "def") == 6 + 3);
   char s[4096];
   assert(sprintf(s, "a%db", 123) == 5);

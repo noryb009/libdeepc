@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-int cmp(const void *a, const void *b) {
+static int cmp(const void *a, const void *b) {
   const int aa = *(const int *)a;
   const int bb = *(const int *)b;
 
@@ -14,7 +14,7 @@ int cmp(const void *a, const void *b) {
   }
 }
 
-void test(int *nums, int *exp, size_t count) {
+static void test(int *nums, int *exp, size_t count) {
   qsort(nums, count, sizeof(int), cmp);
 
   for (size_t i = 0; i < count; ++i) {
@@ -22,7 +22,7 @@ void test(int *nums, int *exp, size_t count) {
   }
 }
 
-int main() {
+int main(void) {
   {
     int nums[] = {8, 2, 1, 5, 3};
     int exp[] = {1, 2, 3, 5, 8};
@@ -30,8 +30,8 @@ int main() {
   }
 
   {
-    int nums[] = {};
-    int exp[] = {};
+    int *nums = NULL;
+    int *exp = NULL;
     test(nums, exp, 0);
   }
 

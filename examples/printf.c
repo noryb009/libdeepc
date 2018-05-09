@@ -2,7 +2,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-int main() {
+int main(void) {
   assert(printf("%") == -1);
   assert(errno == EINVAL);
 

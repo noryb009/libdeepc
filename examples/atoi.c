@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <stdlib.h>
 
-int main() {
+int main(void) {
   assert(atoi("5") == 5);
   assert(atoi("214748363") == 214748363);
   assert(atoi("2147483639") == 2147483639);

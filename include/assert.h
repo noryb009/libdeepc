@@ -2,7 +2,7 @@
 
 #include <stdinternaltypes.h>
 
-_Noreturn void __assert_failure();
+_Noreturn void __assert_failure(const char *file, __size_t line, const char *func);
 
 #ifdef NDEBUG
 #define assert(cond) do {} while(0)

@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -111,7 +112,7 @@ static void read_pos_int(const uintmax_t max, const int base, uintmax_t *result,
       break;
     }
     ++s;
-    if (n < max_div10 || (n == max_div10 && d <= max_mod10)) {
+    if (n < max_div10 || (n == max_div10 && (unsigned int)d <= max_mod10)) {
       /* Step 1 (or 2). */
       n *= base;
       n += d;
