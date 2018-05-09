@@ -58,3 +58,4 @@ expect 0 ./sprintf
 expect 0 ./qsort
 expect 0 ./bsearch
 expect 0 ./strdup
+expect 0 ./atomic_flag
