@@ -12,5 +12,5 @@ void atomic_flag_clear(volatile atomic_flag* flag) {
 void atomic_flag_clear_explicit(volatile atomic_flag* flag, memory_order order) {
   // TODO: Handle memory_order.
   (void)order;
-  flag->set = false;
+  *flag = false;
 }

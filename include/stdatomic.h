@@ -52,12 +52,10 @@ typedef _Atomic ptrdiff_t           atomic_ptrdiff_t;
 typedef _Atomic intmax_t            atomic_intmax_t;
 typedef _Atomic uintmax_t           atomic_uintmax_t;
 
-#define ATOMIC_FLAG_INIT {0}
+#define ATOMIC_FLAG_INIT (0)
 #define ATOMIC_VAR_INIT(value) {(value)}
 
-typedef struct {
-  volatile size_t set;
-} atomic_flag;
+typedef __atomic_flag atomic_flag;
 
 _Bool atomic_flag_test_and_set(volatile atomic_flag *flag);
 _Bool atomic_flag_test_and_set_explicit(volatile atomic_flag *flag, memory_order order);
