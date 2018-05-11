@@ -4,7 +4,7 @@
 
 typedef struct {
   volatile int *a;
-  int count;
+  volatile int count;
   mtx_t mtx;
 } info;
 
@@ -29,7 +29,7 @@ static int adder(void *arg) {
 
 int main(void) {
   info inf;
-  volatile int a;
+  volatile int a = 0;
 
   inf.a = &a;
   inf.count = 100000;

@@ -14,9 +14,9 @@ struct __thrd_t_object {
   __spinlock spin;
   unsigned char *stack_base;
   int id; // TODO: pid_t.
-  int result;
+  volatile int result;
   // TODO: Is `id` needed?
-  signed char refs;
+  volatile signed char refs;
 };
 
 typedef struct {
@@ -141,7 +141,7 @@ int thrd_join(thrd_t thr, int *res) {
     __spinlock_lock(&thr->spin);
   }
   assert(thr->refs == 1);
-  if (*res != NULL) {
+  if (res != NULL) {
     *res = thr->result;
   }
 

@@ -8,7 +8,6 @@ void __spinlock_init(volatile __spinlock *spinlock) {
 }
 
 void __spinlock_lock(volatile __spinlock *spinlock) {
-  atomic_flag_clear(spinlock);
   while (atomic_flag_test_and_set(spinlock) == true) {
     // Busy wait.
   }

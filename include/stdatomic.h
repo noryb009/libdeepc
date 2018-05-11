@@ -4,12 +4,12 @@
 #include <stdint.h>
 
 typedef enum {
-  memory_order_relaxed,
-  memory_order_consume,
-  memory_order_acquire,
-  memory_order_release,
-  memory_order_acq_rel,
-  memory_order_seq_cst,
+  memory_order_relaxed = __ATOMIC_RELAXED,
+  memory_order_consume = __ATOMIC_CONSUME,
+  memory_order_acquire = __ATOMIC_ACQUIRE,
+  memory_order_release = __ATOMIC_RELEASE,
+  memory_order_acq_rel = __ATOMIC_ACQ_REL,
+  memory_order_seq_cst = __ATOMIC_SEQ_CST,
 } memory_order;
 
 typedef _Atomic _Bool               atomic_bool;
@@ -57,10 +57,19 @@ typedef _Atomic uintmax_t           atomic_uintmax_t;
 
 typedef __atomic_flag atomic_flag;
 
-_Bool atomic_flag_test_and_set(volatile atomic_flag *flag);
-_Bool atomic_flag_test_and_set_explicit(volatile atomic_flag *flag, memory_order order);
+#define atomic_thread_fence(v) __atomic_thread_fence((v))
+#define atomic_signal_fence(v) __atomic_signal_fence((v))
 
-void atomic_flag_clear(volatile atomic_flag *flag);
-void atomic_flag_clear_explicit(volatile atomic_flag *flag, memory_order order);
+#define atomic_flag_test_and_set_explicit(f, o) \
+  __atomic_test_and_set((f), (o))
+#define atomic_flag_test_and_set(f) \
+  atomic_flag_test_and_set_explicit((f), memory_order_seq_cst)
+
+// TODO: This doesn't support all memory orders, see:
+// https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html
+#define atomic_flag_clear_explicit(f, o) \
+  __atomic_clear((f), (o))
+#define atomic_flag_clear(f) \
+  atomic_flag_clear_explicit((f), memory_order_seq_cst)
 
 // TODO: Other atomic operations.

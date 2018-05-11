@@ -8,5 +8,4 @@ typedef unsigned long __uintptr_t;
 
 #define __NULL 0
 
-typedef unsigned int __uint32_t;
-typedef __uint32_t __atomic_flag;
+typedef unsigned char __atomic_flag;
