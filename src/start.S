@@ -6,10 +6,10 @@
 .extern exit
 
 _start:
-  # We could pop these, but we don't want to mess up any alignment guarantees we have.
-  mov rdi, [rsp]    # rdi = argc
-  mov rsi, rsp      # rsi = argv (= (&argc) + 8)
-  add rsi, 8
+  pop rdi           # rdi = argc
+  mov rsi, rsp      # rsi = argv
+	and rsp, -16      # Align the stack to 16 bytes.
   call main         # rax = main()
+  # TODO: Call another bootstrapping function that calls exit for us.
   mov rdi, rax      # First parameter: return code.
   call exit

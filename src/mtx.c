@@ -12,26 +12,28 @@ struct mtx_t {
 
 int mtx_init(mtx_t *mutex, int type) {
   // TODO: Handle type.
-  __spinlock_init(mutex->spin);
+  (void)type;
+  __spinlock_init(&mutex->spin);
   return thrd_success;
 }
 
 int mtx_lock(mtx_t *mutex) {
-  __spinlock_lock(mutex->spin);
+  __spinlock_lock(&mutex->spin);
   return thrd_success;
 }
 
 int mtx_trylock(mtx_t *mutex) {
   // TODO: Wait.
-  __spinlock_lock(mutex->spin);
+  __spinlock_lock(&mutex->spin);
   return thrd_success;
 }
 
 int mtx_unlock(mtx_t *mutex) {
-  __spinlock_unlock(mutex->spin);
+  __spinlock_unlock(&mutex->spin);
   return thrd_success;
 }
 
 void mtx_destroy(mtx_t *mutex) {
   // Nothing. Hopefully nobody is waiting.
+  (void)mutex;
 }

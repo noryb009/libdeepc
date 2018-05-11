@@ -60,3 +60,5 @@ expect 0 ./bsearch
 expect 0 ./strdup
 expect 0 ./atomic_flag
 expect 0 ./mtx
+expect 0 ./threads
+expect 0 ./threads2

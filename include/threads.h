@@ -2,9 +2,7 @@
 
 #include <stdinternaltypes.h>
 
-typedef struct {
-  int id;
-} thrd_t;
+typedef struct __thrd_t_object *thrd_t;
 
 typedef int (*thrd_start_t)(void *);
 
@@ -16,16 +14,14 @@ enum {
   thrd_error = 4,
 };
 
-/*
 int thrd_create(thrd_t *thr, thrd_start_t func, void *arg);
 int thrd_equal(thrd_t lhs, thrd_t rhs);
-thrd_t thrd_current();
+thrd_t thrd_current(void);
 // TODO: thrd_sleep
-void thrd_yield();
+void thrd_yield(void);
 _Noreturn void thrd_exit(int res);
 int thrd_detach(thrd_t thr);
 int thrd_join(thrd_t thr, int *res);
-*/
 
 // Mutexes.
 typedef struct {
