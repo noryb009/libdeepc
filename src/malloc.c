@@ -1,12 +1,36 @@
+#include <stdatomic.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <threads.h>
 #include <unistd.h>
 
 // A simple allocator which does not free anything.
 
+// This flag could also go before main() if that makes things easier.
+static volatile atomic_flag malloc_mtx_flag = ATOMIC_FLAG_INIT;
+static volatile bool malloc_mtx_init = false;
+static mtx_t malloc_mtx;
+
 typedef struct {
   size_t size;
 } malloc_metadata;
+
+static void init_malloc(void) {
+  if (malloc_mtx_init) {
+    // Already initialized.
+    return;
+  }
+
+  while (atomic_flag_test_and_set(&malloc_mtx_flag) == true) {
+    // Busy wait for flag...
+  }
+
+  // We don't care if another thread already set the flag.
+  malloc_mtx_init = true;
+
+  atomic_flag_clear(&malloc_mtx_flag);
+}
 
 static malloc_metadata *get_meta(void *ptr) {
   unsigned char *chars = (unsigned char *)ptr;
@@ -23,7 +47,12 @@ void *malloc(size_t size) {
     return NULL;
   }
 
+  init_malloc();
+  mtx_lock(&malloc_mtx);
+
   void *ret = sbrk(size + sizeof(malloc_metadata));
+  mtx_unlock(&malloc_mtx);
+
   if (ret == (void *)-1) {
     return NULL;
   }
