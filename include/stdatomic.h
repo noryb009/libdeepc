@@ -60,16 +60,10 @@ typedef __atomic_flag atomic_flag;
 #define atomic_thread_fence(v) __atomic_thread_fence((v))
 #define atomic_signal_fence(v) __atomic_signal_fence((v))
 
-#define atomic_flag_test_and_set_explicit(f, o) \
-  __atomic_test_and_set((f), (o))
-#define atomic_flag_test_and_set(f) \
-  atomic_flag_test_and_set_explicit((f), memory_order_seq_cst)
+_Bool atomic_flag_test_and_set(volatile atomic_flag *flag);
+_Bool atomic_flag_test_and_set_explicit(volatile atomic_flag *flag, memory_order order);
 
-// TODO: This doesn't support all memory orders, see:
-// https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html
-#define atomic_flag_clear_explicit(f, o) \
-  __atomic_clear((f), (o))
-#define atomic_flag_clear(f) \
-  atomic_flag_clear_explicit((f), memory_order_seq_cst)
+void atomic_flag_clear(volatile atomic_flag *flag);
+void atomic_flag_clear_explicit(volatile atomic_flag *flag, memory_order order);
 
 // TODO: Other atomic operations.

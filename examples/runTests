@@ -60,5 +60,13 @@ expect 0 ./bsearch
 expect 0 ./strdup
 expect 0 ./atomic_flag
 expect 0 ./mtx
-expect 0 ./threads
-expect 0 ./threads2
+
+expectIO 0 "" "Sum is: 1000000" '' ./threads2
+
+thr_output="$(./threads)"
+for i in `seq 5`; do
+  if [[ "$i" != "$(echo "$thr_output" | grep -c "Running, val: $i")" ]]; then
+    echo "Invalid output from ./threads (with $i)"
+    exit 1
+  fi
+done
