@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <limits.h>
 #include <stdarg.h>
+#include <stdatomic.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,6 +10,8 @@
 #include <unistd.h>
 
 #include "file.h"
+
+static volatile atomic_flag f = ATOMIC_FLAG_INIT;
 
 typedef enum {
   OK = 0,
@@ -674,6 +677,8 @@ static void vprintf_write_spec(vprintf_info *info, vprint_spec *spec, va_list ar
 }
 
 static int vprintf_shared(vprintf_info *info, const char * restrict format, va_list args) {
+  while (atomic_flag_test_and_set(&f)) {}
+
   const char *start_literal = format;
   while (info->rc == OK) {
     const char c = *format;
@@ -714,11 +719,13 @@ static int vprintf_shared(vprintf_info *info, const char * restrict format, va_l
   }
   switch (info->rc) {
     case ERR:
+      atomic_flag_clear(&f);
       return -1;
     case END:
     case OK:
       break;
   }
+  atomic_flag_clear(&f);
   return info->written;
 }
 

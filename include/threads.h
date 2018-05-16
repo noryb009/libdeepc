@@ -40,3 +40,19 @@ int mtx_lock(mtx_t *mutex);
 int mtx_trylock(mtx_t *mutex);
 int mtx_unlock(mtx_t *mutex);
 void mtx_destroy(mtx_t *mutex);
+
+// TODO: Call once.
+
+// Thread local storage.
+
+#define thread_local _Thread_local
+
+#define TSS_DTOR_ITERATIONS 9999 // TODO: UINTPTR_MAX
+typedef void (*tss_dtor_t)(void *);
+
+typedef __uintptr_t tss_t;
+
+int tss_create(tss_t *tss_key, tss_dtor_t dtor);
+void *tss_get(tss_t tss_key);
+int tss_set(tss_t tss_id, void *val);
+void tss_delete(tss_t tss_id);

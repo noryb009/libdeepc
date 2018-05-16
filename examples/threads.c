@@ -12,9 +12,7 @@ static int run(void *arg) {
   }
   mtx_unlock(&mtx);
 
-  // TODO: Once thrd_exit work, enable this:
-  //thrd_exit(-cnt);
-  return -cnt;
+  thrd_exit(-cnt);
 }
 
 int main(void) {

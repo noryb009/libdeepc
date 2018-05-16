@@ -43,7 +43,13 @@ int main(void) {
   }
 
   for (int i = 0; i < THRDS; ++i) {
-    thrd_join(tn[i], NULL);
+    int k = 0;
+    if (i == 3) {
+      thrd_join(tn[i], &k);
+      assert(k == 2);
+    } else {
+      thrd_join(tn[i], NULL);
+    }
   }
 
   printf("Sum is: %d\n", a);

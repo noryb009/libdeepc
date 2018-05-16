@@ -28,6 +28,7 @@ static void init_malloc(void) {
 
   // We don't care if another thread already set the flag.
   mtx_init(&malloc_mtx, mtx_plain);
+  // TODO: Do we need a barrier here?
   malloc_mtx_init = true;
 
   atomic_flag_clear(&malloc_mtx_flag);

@@ -14,3 +14,9 @@ __thrd_bootstrap_asm:
 	lea rdi, [rsp - 8]      # Get a pointer to the info struct.
 	and rsp, -16            # Align the stack to 16 bytes.
 	call __thrd_bootstrap_c # Call the C bootstrap function.
+
+# thrd_t __get_current_thread();
+.globl __get_current_thread
+__get_current_thread:
+  mov rax, %fs:0
+  ret

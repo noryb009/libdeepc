@@ -3,22 +3,19 @@
 #include <stdlib.h>
 #include <threads.h>
 
-#include "spinlock.h"
 #include "syscall.h"
+#include "thrd_t_object.h"
+
+// TODO: Figure out how much space we need for thread local storage.
+// For now, we allocate a static number of bytes.
+#define TLS_SPACE 8*64
+
+thrd_t __get_current_thread(void);
 
 typedef void (*thrd_bootstrap_fn)(void);
 _Noreturn void __thrd_bootstrap_asm(void);
 
 // This represents the stack of the new thread when it starts.
-struct __thrd_t_object {
-  __spinlock spin;
-  unsigned char *stack_base;
-  int id; // TODO: pid_t.
-  volatile int result;
-  // TODO: Is `id` needed?
-  volatile signed char refs;
-};
-
 typedef struct {
   // bootstrap_fn MUST be first.
   thrd_bootstrap_fn bootstrap_fn;
@@ -30,12 +27,15 @@ typedef struct {
 const size_t stack_size = 8 * 1024 * 1024; // 8MB stack.
 
 static _Noreturn void thrd_exit_with_thr(int ret, thrd_t thr) {
+  // TODO: Run tss dtors (for each non-NULL active tss).
+
   __spinlock_lock(&thr->spin);
   // TODO: Clean up thr if last reference to it.
   if (thr->refs == 1) {
     // TODO: Free stack.
-    free(thr);
+    free(((unsigned char *)thr) - TLS_SPACE);
   } else {
+    assert(thr->refs == 2);
     thr->result = ret;
     thr->refs--;
     // TODO: Make sure no races here.
@@ -48,7 +48,12 @@ static _Noreturn void thrd_exit_with_thr(int ret, thrd_t thr) {
 _Noreturn void __thrd_bootstrap_c(thrd_bootstrap_info *info);
 _Noreturn void __thrd_bootstrap_c(thrd_bootstrap_info *info) {
   // This was called from the thread bootstrapping assembly.
-  // TODO: Store thr in tls.
+  // First, set up the FS register to point to the thread.
+  if ((int64_t)__syscall2(ARCH_SET_FS, (uint64_t)info->thr, SYS_ARCH_PRCTL) < 0) {
+    // Something is very wrong, exit.
+    abort();
+  }
+
   const int ret = info->func(info->arg);
   thrd_exit_with_thr(ret, info->thr);
 }
@@ -56,17 +61,20 @@ _Noreturn void __thrd_bootstrap_c(thrd_bootstrap_info *info) {
 int thrd_create(thrd_t *thr, thrd_start_t func, void *arg) {
   // This function is based on the clone function, the same way it is used in:
   // https://nullprogram.com/blog/2015/05/15/
-  *thr = malloc(sizeof(struct __thrd_t_object));
+
+  unsigned char *thr_mem = malloc(TLS_SPACE + sizeof(struct __thrd_t_object));
+  *thr = (thrd_t)(thr_mem + TLS_SPACE);
   if (*thr == NULL) {
     return thrd_nomem;
   }
 
+  (*thr)->self = *thr;
   __spinlock_init(&(*thr)->spin);
   (*thr)->refs = 2; // Parent and child has a reference to the thread.
 
   (*thr)->stack_base = malloc(stack_size);
   if ((*thr)->stack_base == NULL) {
-    free(*thr);
+    free(thr_mem);
     return thrd_nomem;
   }
   unsigned char *stack_top = (*thr)->stack_base + stack_size;
@@ -91,7 +99,7 @@ int thrd_create(thrd_t *thr, thrd_start_t func, void *arg) {
   const int64_t id = (int64_t)__syscall3(clone_flags, (uint64_t)stack_top, (uint64_t)(&(*thr)->id), SYS_CLONE);
   if (id < 0) {
     free((*thr)->stack_base);
-    free(*thr);
+    free(thr_mem);
     return thrd_error;
   }
   return thrd_success;
@@ -111,10 +119,7 @@ void thrd_yield(void) {
 }
 
 _Noreturn void thrd_exit(int res) {
-  // TODO: Get thr.
-  //thrd_exit_with_thr(result, thr);
-  (void)res;
-  abort();
+  thrd_exit_with_thr(res, __get_current_thread());
 }
 
 int thrd_detach(thrd_t thr) {
@@ -122,8 +127,9 @@ int thrd_detach(thrd_t thr) {
   thr->refs--;
   if (thr->refs == 0) {
     free(thr->stack_base);
-    free(thr);
+    free(((unsigned char *)thr) - TLS_SPACE);
   } else {
+    assert(thr->refs == 1);
     __spinlock_unlock(&thr->spin);
   }
 
@@ -146,6 +152,6 @@ int thrd_join(thrd_t thr, int *res) {
   }
 
   free(thr->stack_base);
-  free(thr);
+  free(((unsigned char *)thr) - TLS_SPACE);
   return thrd_success;
 }
