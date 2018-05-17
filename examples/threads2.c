@@ -28,6 +28,7 @@ static int adder(void *arg) {
 }
 
 int main(void) {
+  thrd_t cur = thrd_current();
   info inf;
   volatile int a = 0;
 
@@ -55,4 +56,5 @@ int main(void) {
   printf("Sum is: %d\n", a);
 
   mtx_destroy(&inf.mtx);
+  assert(cur == thrd_current());
 }

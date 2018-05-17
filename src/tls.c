@@ -6,7 +6,7 @@
 #include <string.h>
 #include <threads.h>
 
-#include "thrd_t_object.h"
+#include "threads_internal.h"
 
 // From "ELF Handling For Thread-Local Storage", by Ulrich Drepper.
 typedef struct {

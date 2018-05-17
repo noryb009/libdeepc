@@ -24,6 +24,9 @@ static int fn(void *arg) {
 
 int main(void) {
 #define THRDS 10
+  thrd_t cur = thrd_current();
+  a = 5;
+
   thrd_t tn[THRDS];
 
   int arg = 100000;
@@ -34,4 +37,7 @@ int main(void) {
   for (int i = 0; i < THRDS; ++i) {
     thrd_join(tn[i], NULL);
   }
+
+  assert(cur == thrd_current());
+  assert(a == 5);
 }

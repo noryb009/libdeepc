@@ -16,6 +16,7 @@ static int run(void *arg) {
 }
 
 int main(void) {
+  thrd_t cur = thrd_current();
 #define THRDS 5
   int nums[THRDS];
   for (int i = 0; i < THRDS; ++i) {
@@ -35,4 +36,5 @@ int main(void) {
   }
 
   mtx_destroy(&mtx);
+  assert(cur == thrd_current());
 }

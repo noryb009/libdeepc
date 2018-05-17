@@ -3,7 +3,7 @@
 CC := gcc
 CFLAGS := -O0 -g
 WARNINGS := -pedantic -Wall -Wextra -Wshadow -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes
-COMMAND := $(CC) $(CFLAGS) $(WARNINGS) -nostdlib -nostdinc -fno-builtin -I ../include/ -L ../src
+COMMAND := $(CC) $(CFLAGS) $(WARNINGS) -nostdlib -nostdinc -fno-builtin -fno-stack-protector -I ../include/ -L ../src
 LIBS := -l:libyaclib.a
 
 single-file-tests = true false argc stdint stdarg assert assert-fail string strlen setjmp malloc chario echo ctype printf atoi sprintf qsort bsearch strdup atomic_flag mtx threads threads2 tls tss

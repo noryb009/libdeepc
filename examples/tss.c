@@ -56,9 +56,12 @@ int main(void) {
 
   tss_t spare;
   tss_create(&p1, NULL);
+  tss_set(p1, (void *)111);
   tss_create(&spare, NULL);
   tss_create(&counter, count_down_dtor);
+  tss_set(counter, (void *)123);
   tss_create(&p4, total_count_dtor);
+  tss_set(p4, (void *)574);
   for (int i = 5; i < 7; ++i) {
     tss_create(&spare, NULL);
   }
@@ -78,6 +81,7 @@ int main(void) {
     tss_create(&spare, NULL);
   }
   tss_create(&p9, total_count_dtor);
+  tss_set(p9, (void *)579);
   p9_created = true;
 
   for (int i = 0; i < THRDS; ++i) {
@@ -88,6 +92,13 @@ int main(void) {
     assert(nums[i] == 0);
   }
   total_count = -(THRDS + (THRDS / 2));
+
+  assert((uintptr_t)tss_get(p1) == 111);
+  assert((uintptr_t)tss_get(counter) == 123);
+  assert((uintptr_t)tss_get(p4) == 574);
+  assert((uintptr_t)tss_get(p9) == 579);
+
+  tss_delete(p9);
   
   mtx_destroy(&mtx);
 }
