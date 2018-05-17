@@ -15,3 +15,7 @@ struct __thrd_t_object {
   // TODO: Is `id` needed?
   volatile signed char refs;
 };
+
+extern thread_local void **__tss_data;
+extern thread_local tss_t __tss_data_capacity;
+void __run_tss_destructors(void);

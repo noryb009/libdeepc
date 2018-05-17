@@ -47,12 +47,15 @@ void mtx_destroy(mtx_t *mutex);
 
 #define thread_local _Thread_local
 
-#define TSS_DTOR_ITERATIONS 9999 // TODO: UINTPTR_MAX
+// Thread specific storage.
+
+// TODO Make larger.
+#define TSS_DTOR_ITERATIONS 1
 typedef void (*tss_dtor_t)(void *);
 
 typedef __uintptr_t tss_t;
 
 int tss_create(tss_t *tss_key, tss_dtor_t dtor);
 void *tss_get(tss_t tss_key);
-int tss_set(tss_t tss_id, void *val);
-void tss_delete(tss_t tss_id);
+int tss_set(tss_t tss_key, void *val);
+void tss_delete(tss_t tss_key);

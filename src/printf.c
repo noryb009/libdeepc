@@ -7,10 +7,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <threads.h>
 #include <unistd.h>
 
 #include "file.h"
 
+// TODO: Remove this...
 static volatile atomic_flag f = ATOMIC_FLAG_INIT;
 
 typedef enum {
@@ -677,7 +679,9 @@ static void vprintf_write_spec(vprintf_info *info, vprint_spec *spec, va_list ar
 }
 
 static int vprintf_shared(vprintf_info *info, const char * restrict format, va_list args) {
-  while (atomic_flag_test_and_set(&f)) {}
+  while (atomic_flag_test_and_set(&f)) {
+    thrd_yield();
+  }
 
   const char *start_literal = format;
   while (info->rc == OK) {

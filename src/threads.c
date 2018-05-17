@@ -10,8 +10,6 @@
 // For now, we allocate a static number of bytes.
 #define TLS_SPACE 8*64
 
-thrd_t __get_current_thread(void);
-
 typedef void (*thrd_bootstrap_fn)(void);
 _Noreturn void __thrd_bootstrap_asm(void);
 
@@ -27,10 +25,9 @@ typedef struct {
 const size_t stack_size = 8 * 1024 * 1024; // 8MB stack.
 
 static _Noreturn void thrd_exit_with_thr(int ret, thrd_t thr) {
-  // TODO: Run tss dtors (for each non-NULL active tss).
+  __run_tss_destructors();
 
   __spinlock_lock(&thr->spin);
-  // TODO: Clean up thr if last reference to it.
   if (thr->refs == 1) {
     // TODO: Free stack.
     free(((unsigned char *)thr) - TLS_SPACE);
@@ -38,7 +35,6 @@ static _Noreturn void thrd_exit_with_thr(int ret, thrd_t thr) {
     assert(thr->refs == 2);
     thr->result = ret;
     thr->refs--;
-    // TODO: Make sure no races here.
     __spinlock_unlock(&thr->spin);
   }
 
@@ -53,6 +49,11 @@ _Noreturn void __thrd_bootstrap_c(thrd_bootstrap_info *info) {
     // Something is very wrong, exit.
     abort();
   }
+
+  // Set up the thread's tss data structures.
+  // TODO: When we do dynamic linking, make these regular initializations.
+  __tss_data = NULL;
+  __tss_data_capacity = 0;
 
   const int ret = info->func(info->arg);
   thrd_exit_with_thr(ret, info->thr);
@@ -94,7 +95,6 @@ int thrd_create(thrd_t *thr, thrd_start_t func, void *arg) {
   // TODO: CLONE_CHILD_CLEARTID?
   const uint64_t clone_flags =
     CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PARENT | CLONE_THREAD | CLONE_PARENT_SETTID;
-  // TODO: TLS stuff?
 
   const int64_t id = (int64_t)__syscall3(clone_flags, (uint64_t)stack_top, (uint64_t)(&(*thr)->id), SYS_CLONE);
   if (id < 0) {
@@ -109,17 +109,12 @@ int thrd_equal(thrd_t lhs, thrd_t rhs) {
   return lhs == rhs;
 }
 
-thrd_t thrd_current(void) {
-  // TODO: Use tls.
-  return NULL;
-}
-
 void thrd_yield(void) {
-  // TODO: sleep.
+  __syscall0(SYS_SCHED_YIELD);
 }
 
 _Noreturn void thrd_exit(int res) {
-  thrd_exit_with_thr(res, __get_current_thread());
+  thrd_exit_with_thr(res, thrd_current());
 }
 
 int thrd_detach(thrd_t thr) {

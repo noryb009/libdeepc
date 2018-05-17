@@ -2,7 +2,7 @@
 
 typedef int errno_t;
 
-extern errno_t errno;
+extern _Thread_local errno_t errno;
 
 #define ENOMEM 12
 #define EINVAL 22

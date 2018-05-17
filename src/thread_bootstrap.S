@@ -15,8 +15,8 @@ __thrd_bootstrap_asm:
 	and rsp, -16            # Align the stack to 16 bytes.
 	call __thrd_bootstrap_c # Call the C bootstrap function.
 
-# thrd_t __get_current_thread();
-.globl __get_current_thread
-__get_current_thread:
+# thrd_t thrd_current(void);
+.globl thrd_current
+thrd_current:
   mov rax, %fs:0
   ret

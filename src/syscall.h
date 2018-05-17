@@ -6,6 +6,7 @@ typedef enum {
   SYS_READ = 0,
   SYS_WRITE = 1,
   SYS_BRK = 12,
+  SYS_SCHED_YIELD = 24,
   SYS_CLONE = 56,
   SYS_EXIT = 60,
   SYS_ARCH_PRCTL = 158,

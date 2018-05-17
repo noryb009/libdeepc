@@ -62,6 +62,7 @@ expect 0 ./atomic_flag
 expect 0 ./mtx
 expectIO 0 "" "Sum is: 1000000" '' ./threads2
 expect 0 ./tls
+expect 0 ./tss
 
 thr_output="$(./threads)"
 for i in `seq 5`; do
