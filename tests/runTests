@@ -64,6 +64,7 @@ expectIO 0 "" "Sum is: 1000000" '' ./threads2
 expect 0 ./tls
 expect 0 ./tss
 expect 0 ./math
+expect 0 ./iso646
 
 thr_output="$(./threads)"
 for i in `seq 5`; do
