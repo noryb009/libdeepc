@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -58,6 +59,32 @@ _Noreturn void __stack_chk_fail(void) {
   // TODO: Output fail message.
   _Exit(42);
 }
+
+#define ABS(T, name) \
+  T name(T n) { \
+    if (n < 0) { \
+      return -n; \
+    } \
+    return n; \
+  }
+
+ABS(int, abs)
+ABS(long, labs)
+ABS(long long, llabs)
+ABS(intmax_t, imaxabs)
+
+#define DIV(T, I, name) \
+  T name(I x, I y) { \
+    T ret; \
+    ret.quot = x / y; \
+    ret.rem = x % y; \
+    return ret; \
+  }
+
+DIV(div_t, int, div)
+DIV(ldiv_t, long, ldiv)
+DIV(lldiv_t, long long, lldiv)
+DIV(imaxdiv_t, intmax_t, imaxdiv)
 
 static void swap(void *a, void *b, size_t size) {
   if (a == b) {

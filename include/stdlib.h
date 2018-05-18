@@ -34,6 +34,28 @@ long long strtoll(const char * restrict str, char ** restrict str_end, int base)
 unsigned long strtoul(const char * restrict str, char ** restrict str_end, int base);
 unsigned long long strtoull(const char * restrict str, char ** restrict str_end, int base);
 
+// Simple math.
+int abs(int n);
+long labs(long n);
+long long llabs(long long n);
+
+typedef struct {
+  int quot;
+  int rem;
+} div_t;
+typedef struct {
+  long quot;
+  long rem;
+} ldiv_t;
+typedef struct {
+  long long quot;
+  long long rem;
+} lldiv_t;
+
+div_t div(int x, int y);
+ldiv_t ldiv(long x, long y);
+lldiv_t lldiv(long long x, long long y);
+
 // Algorithms.
 void qsort(void *ptr, size_t count, size_t size, int (*comp)(const void *, const void *));
 void *bsearch(
