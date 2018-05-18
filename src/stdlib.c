@@ -46,7 +46,7 @@ _Noreturn void quick_exit(int ret) {
 }
 
 _Noreturn void _Exit(int ret) {
-  __syscall1_noret(ret, SYS_EXIT);
+  __syscall1_noret(ret, SYS_EXIT_GROUP);
 }
 
 _Noreturn void abort() {
