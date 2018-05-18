@@ -10,6 +10,7 @@ typedef enum {
   SYS_CLONE = 56,
   SYS_EXIT = 60,
   SYS_ARCH_PRCTL = 158,
+  SYS_CLOCK_GETTIME = 228,
   SYS_EXIT_GROUP = 231,
 } Syscall;
 
