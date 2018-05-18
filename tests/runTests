@@ -43,7 +43,7 @@ expect 2 ./argc a
 expect 0 ./stdint
 expect 0 ./stdarg
 expect 2 ./assert
-expectIO 1 "" $'Assert failure:\n  File: assert-fail.c\n  Func: main\n  Line: 4' ./assert-fail
+expectIO 1 "" $'Assert failure:\n  File: assert-fail-test.c\n  Func: main\n  Line: 4' ./assert-fail
 expect 3 ./string
 expect 5 ./strlen abcde
 expect 0 ./strlen ""
@@ -58,7 +58,7 @@ expect 0 ./sprintf
 expect 0 ./qsort
 expect 0 ./bsearch
 expect 0 ./strdup
-expect 0 ./atomic_flag
+expect 0 ./atomic-flag
 expect 0 ./mtx
 expectIO 0 "" "Sum is: 1000000" '' ./threads2
 expect 0 ./tls

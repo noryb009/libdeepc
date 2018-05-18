@@ -1,8 +1,8 @@
 test:
-	cd examples && $(MAKE) test
+	cd tests && $(MAKE) test
 
 all:
-	cd examples && $(MAKE) all
+	cd tests && $(MAKE) all
 
 clean:
-	cd examples && $(MAKE) clean
+	cd tests && $(MAKE) clean

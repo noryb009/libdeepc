@@ -4,7 +4,7 @@
 #include <threads.h>
 
 #include "syscall.h"
-#include "threads_internal.h"
+#include "threads-internal.h"
 
 // TODO: Figure out how much space we need for thread local storage.
 // For now, we allocate a static number of bytes.

@@ -1,6 +1,6 @@
 include/*
-examples/*
 src/*
+tests/*
 !*/Makefile
 !*/runTests
 !*/*.c
