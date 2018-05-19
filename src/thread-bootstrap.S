@@ -20,3 +20,10 @@ __thrd_bootstrap_asm:
 thrd_current:
   mov rax, %fs:0
   ret
+
+# void __copy_stack_protector(uintptr_t *to)
+.global __copy_stack_protector
+__copy_stack_protector:
+  mov rsi, %fs:0x28
+	mov [rdi], rsi
+	ret

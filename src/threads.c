@@ -13,6 +13,8 @@
 typedef void (*thrd_bootstrap_fn)(void);
 _Noreturn void __thrd_bootstrap_asm(void);
 
+void __copy_stack_protector(uintptr_t *to);
+
 // This represents the stack of the new thread when it starts.
 typedef struct {
   // bootstrap_fn MUST be first.
@@ -40,6 +42,8 @@ static thrd_t create_thrd_t(void) {
   thr->self = thr;
   __spinlock_init(&thr->spin);
   thr->refs = 2; // Parent and child has a reference to the thread.
+  // Set up the stack protector in the new thread object.
+  __copy_stack_protector(&thr->stack_protector);
   return thr;
 }
 
@@ -91,7 +95,7 @@ _Noreturn void __yac_main(int argc, char **argv) {
   }
   thr->stack_base = NULL;
 
-  // TODO: This disallows using stack protectors.
+  // Switch to the new thread object.
   setup_tls(thr);
 
   const int result = main(argc, argv);
