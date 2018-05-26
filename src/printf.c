@@ -75,8 +75,7 @@ static void write_fd(vprintf_info *info, const void *buf, const size_t size) {
   // TODO: Use fwrite.
   const ssize_t written = write(info->file->fd, buf, size);
   // Check for errors.
-  if (written < 0) {
-    errno = -written;
+  if (written == -1) {
     info->rc = ERR;
     return;
   }

@@ -20,19 +20,9 @@ void *sbrk(intptr_t increment) {
 }
 
 ssize_t read(int fd, void *buf, size_t count) {
-  const ssize_t ret = (ssize_t)__syscall3(fd, (uint64_t)buf, count, SYS_READ);
-  if (ret < 0) {
-    errno = -ret;
-    return -1;
-  }
-  return ret;
+  return (ssize_t)__syscall3(fd, (uint64_t)buf, count, SYS_READ);
 }
 
 ssize_t write(int fd, const void *buf, size_t count) {
-  const ssize_t ret = (ssize_t)__syscall3(fd, (uint64_t)buf, count, SYS_WRITE);
-  if (ret < 0) {
-    errno = -ret;
-    return -1;
-  }
-  return ret;
+  return (ssize_t)__syscall3(fd, (uint64_t)buf, count, SYS_WRITE);
 }

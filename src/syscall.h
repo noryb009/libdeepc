@@ -28,11 +28,20 @@ typedef enum {
 #define ARCH_GET_FS 0x1003
 #define ARCH_GET_GS 0x1004
 
-extern uint64_t __syscall0(Syscall);
-extern uint64_t __syscall1(uint64_t, Syscall);
-extern uint64_t __syscall2(uint64_t, uint64_t, Syscall);
-extern uint64_t __syscall3(uint64_t, uint64_t, uint64_t, Syscall);
-extern uint64_t __syscall4(uint64_t, uint64_t, uint64_t, uint64_t, Syscall);
-extern uint64_t __syscall5(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, Syscall);
+// Assemlbly functions.
+extern int64_t __syscall_raw0(Syscall);
+extern int64_t __syscall_raw1(uint64_t, Syscall);
+extern int64_t __syscall_raw2(uint64_t, uint64_t, Syscall);
+extern int64_t __syscall_raw3(uint64_t, uint64_t, uint64_t, Syscall);
+extern int64_t __syscall_raw4(uint64_t, uint64_t, uint64_t, uint64_t, Syscall);
+extern int64_t __syscall_raw5(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, Syscall);
 
 extern _Noreturn void __syscall1_noret(uint64_t, Syscall);
+
+// Wrappers around the assembly functions.
+int64_t __syscall0(Syscall);
+int64_t __syscall1(uint64_t, Syscall);
+int64_t __syscall2(uint64_t, uint64_t, Syscall);
+int64_t __syscall3(uint64_t, uint64_t, uint64_t, Syscall);
+int64_t __syscall4(uint64_t, uint64_t, uint64_t, uint64_t, Syscall);
+int64_t __syscall5(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, Syscall);

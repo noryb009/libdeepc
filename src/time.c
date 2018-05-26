@@ -12,12 +12,7 @@ double difftime(time_t time_end, time_t time_begin) {
 
 static bool get_clock(struct timespec *ts, uint64_t mode) {
   // TODO: Use vdso.
-  const uint64_t ret = __syscall2(mode, (uint64_t)ts, SYS_CLOCK_GETTIME) > -4096UL;
-  if (ret > -4096UL) {
-    errno = -ret;
-    return false;
-  }
-  return true;
+  return __syscall2(mode, (uint64_t)ts, SYS_CLOCK_GETTIME) != -1;
 }
 
 time_t time(time_t *arg) {
