@@ -6,12 +6,17 @@ typedef enum {
   SYS_READ = 0,
   SYS_WRITE = 1,
   SYS_BRK = 12,
+  SYS_RT_SIGACTION = 13,
   SYS_SCHED_YIELD = 24,
+  SYS_GETPID = 39,
   SYS_CLONE = 56,
   SYS_EXIT = 60,
+  SYS_KILL = 62,
   SYS_ARCH_PRCTL = 158,
+  SYS_GETTID = 186,
   SYS_CLOCK_GETTIME = 228,
   SYS_EXIT_GROUP = 231,
+  SYS_TGKILL = 234,
 } Syscall;
 
 #define CLONE_VM             0x00000100

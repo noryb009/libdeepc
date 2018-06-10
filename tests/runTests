@@ -66,6 +66,7 @@ expect 0 ./tss
 expect 0 ./math
 expect 0 ./iso646
 expect 0 ./time
+expectIO 136 "" $'S8' '' ./signal
 
 thr_output="$(./threads)"
 for i in `seq 5`; do
