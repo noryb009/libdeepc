@@ -64,3 +64,7 @@ void *bsearch(
     size_t count,
     size_t size,
     int (*comp)(const void *, const void *));
+
+// Environment functions.
+extern char **environ;
+char *getenv(const char *name);

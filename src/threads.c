@@ -87,7 +87,7 @@ _Noreturn void __thrd_bootstrap_c(thrd_bootstrap_info *info) {
   thrd_exit_with_thr(ret, info->thr);
 }
 
-int main(int argc, char **argv);
+int main(int argc, char **argv, char **envp);
 _Noreturn void __yac_main(int argc, char **argv) {
   thrd_t thr = create_thrd_t();
   if (!thr) {
@@ -98,7 +98,10 @@ _Noreturn void __yac_main(int argc, char **argv) {
   // Switch to the new thread object.
   setup_tls(thr);
 
-  const int result = main(argc, argv);
+  // Save the environment variable array.
+  environ = argv + argc + 1;
+
+  const int result = main(argc, argv, environ);
   free_thrd_t(thr, false);
   exit(result);
 }

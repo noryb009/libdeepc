@@ -6,6 +6,8 @@
 
 #define AT_EXIT_FUNCS 32
 
+char **environ;
+
 static int cur_at_exit_func = 0;
 static int cur_at_quick_exit_func = 0;
 static __atexit_func (*at_exit_funcs[AT_EXIT_FUNCS]);
@@ -147,6 +149,16 @@ void *bsearch(
       max = mid;
     } else {
       return (void *)mid_ptr;
+    }
+  }
+  return NULL;
+}
+
+char *getenv(const char *name) {
+  const size_t len = strlen(name);
+  for (char **e = environ; *e != NULL; ++e) {
+    if (memcmp(name, *e, len) == 0 && (*e)[len] == '=') {
+      return *e + len + 1;
     }
   }
   return NULL;

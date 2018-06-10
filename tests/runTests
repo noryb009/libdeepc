@@ -67,6 +67,8 @@ expect 0 ./math
 expect 0 ./iso646
 expect 0 ./time
 expectIO 136 "" $'S8' '' ./signal
+TEST="123" TEST2="456" expectIO 0 "" $'TEST is: TEST=123\nTEST2 is: 456' ./env
+TEST="" TEST2="" expectIO 0 "" $'TEST is: TEST=\nTEST2 is: ' ./env
 
 thr_output="$(./threads)"
 for i in `seq 5`; do
