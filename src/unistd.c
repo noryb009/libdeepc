@@ -6,7 +6,7 @@
 #include "syscall.h"
 
 void *sbrk(intptr_t increment) {
-  const uint64_t cur_break = __syscall1(increment, SYS_BRK);
+  const uint64_t cur_break = __syscall1(0, SYS_BRK);
   if (increment == 0) {
     return (void *)cur_break;
   }
@@ -25,4 +25,8 @@ ssize_t read(int fd, void *buf, size_t count) {
 
 ssize_t write(int fd, const void *buf, size_t count) {
   return (ssize_t)__syscall3(fd, (uint64_t)buf, count, SYS_WRITE);
+}
+
+pid_t getpid(void) {
+  return __syscall0(SYS_GETPID);
 }
