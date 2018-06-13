@@ -1,30 +1,3 @@
 #pragma once
 
-#define CHAR_BIT 8
-#ifdef __CHAR_UNSIGNED__
-#define CHAR_MAX  127
-#define CHAR_MIN -128
-#else
-#define CHAR_MAX 255
-#define CHAR_MIN 0
-#endif
-
-#define SCHAR_MAX  127
-#define SCHAR_MIN -128
-#define UCHAR_MAX  255
-
-#define SSHRT_MAX  32768
-#define SSHRT_MIN -32767
-#define USHRT_MAX  65535
-
-#define  INT_MAX  2147483647
-#define  INT_MIN -2147483648
-#define UINT_MAX  4294967295
-
-#define  LONG_MAX  9223372036854775807l
-#define  LONG_MIN (-LONG_MAX-1)
-#define ULONG_MAX  18446744073709551615ul
-
-#define  LLONG_MAX  9223372036854775807ll
-#define  LLONG_MIN (-LLONG_MAX-1)
-#define ULLONG_MAX  18446744073709551615ull
+#include <__limits.h>

@@ -1,8 +1,15 @@
 include/*
+scripts/*
 src/*
 tests/*
 !*/Makefile
 !*/runTests
 !*/*.c
+!*/*.in
 !*/*.h
+!*/*.py
 !*/*.S
+include/__inttypes.h
+include/__limits.h
+include/__stdint.h
+scripts/size-of.c
