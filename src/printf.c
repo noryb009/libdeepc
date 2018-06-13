@@ -577,6 +577,10 @@ static void vprintf_conv_c(vprintf_info *info, vprint_spec *spec, const unsigned
 }
 
 static void vprintf_conv_s(vprintf_info *info, vprint_spec *spec, const char * restrict str) {
+  // Make things a bit nicer when we print a null string. 
+  if (str == NULL) {
+    str = "(NULL)";
+  }
   const size_t str_len = strlen(str);
   const size_t len =
     ((spec->precision_set && spec->precision >= 0 && (size_t)spec->precision < str_len)
