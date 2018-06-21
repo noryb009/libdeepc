@@ -70,6 +70,12 @@ expectIO 136 "" $'S8' '' ./signal
 TEST="123" TEST2="456" expectIO 0 "" $'TEST is: TEST=123\nTEST2 is: 456' ./env
 TEST="" TEST2="" expectIO 0 "" $'TEST is: TEST=\nTEST2 is: ' ./env
 
+touch test-data/unreadable
+chmod 000 test-data/unreadable
+expect 0 ./file
+# Run file twice, in case it changed any files.
+expect 0 ./file
+
 thr_output="$(./threads)"
 for i in `seq 5`; do
   if [[ "$i" != "$(echo "$thr_output" | grep -c "Running, val: $i")" ]]; then

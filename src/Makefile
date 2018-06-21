@@ -6,7 +6,7 @@ WARNINGS := -pedantic -Wall -Wextra -Wshadow -Wpointer-arith -Wstrict-prototypes
 COMMAND := $(CC) $(CFLAGS) $(WARNINGS) -nostdlib -nostdinc -fno-builtin -fstack-protector-all -I ../include/
 
 GENERATED = ../include/__inttypes.h ../include/__limits.h ../include/__stdint.h
-OBJECTS = errno.o stdlib.o setjmp.o unistd.o syscall.o syscall-asm.o malloc.o string.o stdio.o ctype.o printf.o assert.o atoi.o start.o atomic-flag.o atomic-flag-set.o mtx.o spinlock.o threads.o thread-bootstrap.o tls.o time.o signal.o signal-restorer.o
+OBJECTS = errno.o stdlib.o setjmp.o unistd.o syscall.o syscall-asm.o malloc.o string.o stdio.o ctype.o printf.o assert.o atoi.o start.o atomic-flag.o atomic-flag-set.o mtx.o spinlock.o threads.o thread-bootstrap.o tls.o time.o signal.o signal-restorer.o fcntl.o file.o
 DEPENDS = ${OBJECTS:.o=.d}
 
 all: libyaclib.a

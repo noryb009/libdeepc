@@ -23,6 +23,10 @@ ssize_t read(int fd, void *buf, size_t count) {
   return (ssize_t)__syscall3(fd, (uint64_t)buf, count, SYS_READ);
 }
 
+int close(int fd) {
+  return (int)__syscall1(fd, SYS_CLOSE);
+}
+
 ssize_t write(int fd, const void *buf, size_t count) {
   return (ssize_t)__syscall3(fd, (uint64_t)buf, count, SYS_WRITE);
 }

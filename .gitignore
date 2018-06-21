@@ -2,6 +2,9 @@ include/*
 scripts/*
 src/*
 tests/*
+!tests/test-data
+tests/test-data/scratch
+tests/test-data/unreadable
 !*/Makefile
 !*/runTests
 !*/*.c

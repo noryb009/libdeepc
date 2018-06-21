@@ -46,3 +46,10 @@ int printf(const char * restrict format, ...);
 int fprintf(FILE * restrict stream, const char * restrict format, ...);
 int sprintf(char * restrict buffer, const char * restrict format, ...);
 int snprintf(char * restrict buffer, size_t buf_size, const char * restrict format, ...);
+
+// File management.
+FILE *fopen(const char *restrict filename, const char *restrict mode);
+// TODO: freopen and fwide.
+int fclose(FILE *stream);
+int fflush(FILE *stream);
+// TODO: setbuf and setvbuf

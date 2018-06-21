@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 struct FILE {
-  unsigned int fd;
+  int fd;
   unsigned int eof;
   unsigned int err;
   fpos_t pos;
