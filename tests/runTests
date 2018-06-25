@@ -75,6 +75,7 @@ chmod 000 test-data/unreadable
 expect 0 ./file
 # Run file twice, in case it changed any files.
 expect 0 ./file
+expectIO 0 "" $'a' ./system
 
 thr_output="$(./threads)"
 for i in `seq 5`; do

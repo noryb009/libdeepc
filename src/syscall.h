@@ -12,7 +12,10 @@ typedef enum {
   SYS_SCHED_YIELD = 24,
   SYS_GETPID = 39,
   SYS_CLONE = 56,
+  SYS_FORK = 57,
+  SYS_EXECVE = 59,
   SYS_EXIT = 60,
+  SYS_WAIT4 = 61,
   SYS_KILL = 62,
   SYS_ARCH_PRCTL = 158,
   SYS_GETTID = 186,
@@ -44,6 +47,7 @@ extern int64_t __syscall_raw4(uint64_t, uint64_t, uint64_t, uint64_t, Syscall);
 extern int64_t __syscall_raw5(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, Syscall);
 
 extern _Noreturn void __syscall1_noret(uint64_t, Syscall);
+extern _Noreturn void __syscall3_noret(uint64_t, uint64_t, uint64_t, Syscall);
 
 // Wrappers around the assembly functions.
 int64_t __syscall0(Syscall);

@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include "syscall.h"
@@ -33,4 +34,19 @@ ssize_t write(int fd, const void *buf, size_t count) {
 
 pid_t getpid(void) {
   return __syscall0(SYS_GETPID);
+}
+
+pid_t fork(void) {
+  return __syscall0(SYS_FORK);
+}
+
+_Noreturn void execve(
+      const char *filename,
+      const char *const *argv,
+      char *const envp[]) {
+  __syscall3_noret((uintptr_t)filename, (uintptr_t)argv, (uintptr_t)envp, SYS_EXECVE);
+}
+
+pid_t waitpid(pid_t pid, int *stat_loc, int options) {
+  return __syscall4(pid, (uintptr_t)stat_loc, options, (uintptr_t)NULL, SYS_WAIT4);
 }

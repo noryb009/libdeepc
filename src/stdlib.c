@@ -1,6 +1,8 @@
 #include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "syscall.h"
 
@@ -162,4 +164,31 @@ char *getenv(const char *name) {
     }
   }
   return NULL;
+}
+
+int system(const char *command) {
+  if (command == NULL) {
+    return 1;
+  }
+
+  // TODO: Signal handling?
+
+  const char *args[] = {
+    "/usr/bin/env",
+    "sh",
+    "-c",
+    command,
+    NULL
+  };
+
+  // TODO: Use vfork().
+  pid_t pid = fork();
+  if (pid == 0) {
+    // TODO: Update this when implementing setenv().
+    execve(args[0], args, environ);
+  }
+
+  int rc;
+  waitpid(pid, &rc, 0);
+  return rc;
 }

@@ -68,3 +68,4 @@ void *bsearch(
 // Environment functions.
 extern char **environ;
 char *getenv(const char *name);
+int system(const char *command);

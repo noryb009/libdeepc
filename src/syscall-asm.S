@@ -20,7 +20,9 @@ __syscall_raw2:
   syscall
 	ret
 .globl __syscall_raw3
+.globl __syscall3_noret
 __syscall_raw3:
+__syscall3_noret:
   mov rax, rcx
   syscall
 	ret
