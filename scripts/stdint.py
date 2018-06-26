@@ -224,16 +224,16 @@ def make_stdint(
 
     f.write('#include <__stdint.h>\n\n')
 
-    define('CHAR_BIT', '{}'.format(CHAR_BIT))
+    define('__CHAR_BIT', '{}'.format(CHAR_BIT))
 
     char_max = 127 if is_char_signed() else 255
     char_min = char_max - 255
-    define('CHAR_MIN', '({})'.format(char_min))
-    define('CHAR_MAX', '({})'.format(char_max))
+    define('__CHAR_MIN', '({})'.format(char_min))
+    define('__CHAR_MAX', '({})'.format(char_max))
 
-    define('SCHAR_MIN', ' __INT8_MIN')
-    define('SCHAR_MAX', ' __INT8_MAX')
-    define('UCHAR_MAX', '__UINT8_MAX')
+    define('__SCHAR_MIN', ' __INT8_MIN')
+    define('__SCHAR_MAX', ' __INT8_MAX')
+    define('__UCHAR_MAX', '__UINT8_MAX')
 
     def minmax_or_number(
         t: str,
@@ -262,9 +262,9 @@ def make_stdint(
       return '(-{}{}-1)'.format(max_val, suffix)
 
     for (name, t) in LIMITS:
-      define(' {}_MIN'.format(name), minmax_or_number(t, signed=True, is_max=False))
-      define(' {}_MAX'.format(name), minmax_or_number(t, signed=True, is_max=True))
-      define('U{}_MAX'.format(name), minmax_or_number(t, signed=False, is_max=True))
+      define(' __{}_MIN'.format(name), minmax_or_number(t, signed=True, is_max=False))
+      define(' __{}_MAX'.format(name), minmax_or_number(t, signed=True, is_max=True))
+      define('__U{}_MAX'.format(name), minmax_or_number(t, signed=False, is_max=True))
 
 if __name__ == '__main__':
   type_sizes: Dict[str, int] = {}

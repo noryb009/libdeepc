@@ -1,5 +1,6 @@
 #pragma once
 
+#include <__limits.h>
 #include <__stdint.h>
 
 typedef   __int8_t   int8_t;
@@ -106,3 +107,6 @@ typedef __uintmax_t uintmax_t;
 
 #define  INTMAX_C(c)  __INTMAX_C(c)
 #define UINTMAX_C(c) __UINTMAX_C(c)
+
+#define SIG_ATOMIC_MIN __INT_MIN
+#define SIG_ATOMIC_MAX __INT_MAX
