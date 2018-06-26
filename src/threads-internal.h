@@ -27,7 +27,7 @@ static_assert(offsetof(struct __thrd_t_object, stack_protector) == 0x28,
               "Invalid stack protector offset.");
 
 // The function run before main().
-_Noreturn void __yac_main(int argc, char **argv);
+_Noreturn void __libc_start_main(int argc, char **argv);
 
 extern thread_local void **__tss_data;
 extern thread_local tss_t __tss_data_capacity;

@@ -88,7 +88,7 @@ _Noreturn void __thrd_bootstrap_c(thrd_bootstrap_info *info) {
 }
 
 int main(int argc, char **argv, char **envp);
-_Noreturn void __yac_main(int argc, char **argv) {
+_Noreturn void __libc_start_main(int argc, char **argv) {
   thrd_t thr = create_thrd_t();
   if (!thr) {
     abort();

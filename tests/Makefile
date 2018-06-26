@@ -4,15 +4,15 @@ CC := gcc
 CFLAGS := -O0 -g
 WARNINGS := -pedantic -Wall -Wextra -Wshadow -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes
 COMMAND := $(CC) $(CFLAGS) $(WARNINGS) -nostdlib -nostdinc -fno-builtin -fstack-protector-all -I ../include/ -L ../src
-LIBS := -l:libyaclib.a
+LIBS := -l:libdeepc.a
 
 single-file-tests = true false includes argc stdint stdarg assert assert-fail string strlen setjmp malloc chario echo ctype printf atoi sprintf qsort bsearch strdup atomic-flag mtx threads threads2 tls tss math iso646 time signal env file system
 
-.PHONY: all libyaclib clean $(single-file-tests)
+.PHONY: all libdeepc clean $(single-file-tests)
 
-all: libyaclib $(single-file-tests)
+all: libdeepc $(single-file-tests)
 
-libyaclib:
+libdeepc:
 	cd ../src/ && make all
 
 clean:
