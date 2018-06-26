@@ -2,6 +2,7 @@
 
 int isalnum(int ch);
 int isalpha(int ch);
+int isascii(int ch);
 int islower(int ch);
 int isupper(int ch);
 int isdigit(int ch);
@@ -15,3 +16,4 @@ int ispunct(int ch);
 
 int tolower(int ch);
 int toupper(int ch);
+int toascii(int ch);

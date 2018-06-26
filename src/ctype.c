@@ -63,3 +63,11 @@ int toupper(int ch) {
   }
   return ch;
 }
+
+int isascii(int ch) {
+  return BETWEEN(0, 127);
+}
+
+int toascii(int ch) {
+  return ch & 0x7f;
+}

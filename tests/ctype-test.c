@@ -26,4 +26,13 @@ int main(void) {
   assert(toupper('A'-1) == 'A'-1);
   assert(toupper('Z') == 'Z');
   assert(toupper('Z'+1) == 'Z'+1);
+
+  assert(isascii(0));
+  assert(isascii('Z'));
+  assert(isascii(127));
+  assert(!isascii(128));
+  assert(!isascii(256));
+
+  assert(toascii(0xfff) == 0x7f);
+  assert(toascii(0xf9e) == 0x1e);
 }
