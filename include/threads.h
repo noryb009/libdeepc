@@ -1,5 +1,6 @@
 #pragma once
 
+#include <__stdint.h>
 #include <stdinternaltypes.h>
 
 typedef struct __thrd_t_object *thrd_t;
