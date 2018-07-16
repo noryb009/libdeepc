@@ -1,6 +1,6 @@
 #pragma once
 
-#include <__size_t.h>
+#include <bits/size_t.h>
 #include <stdinternaltypes.h>
 
 typedef __intptr_t ptrdiff_t;
