@@ -1,7 +1,7 @@
 #pragma once
 
-#include <__limits.h>
-#include <__stdint.h>
+#include <gen/limits.h>
+#include <gen/stdint.h>
 
 typedef   __int8_t   int8_t;
 typedef  __uint8_t  uint8_t;

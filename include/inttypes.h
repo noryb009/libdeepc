@@ -1,6 +1,6 @@
 #pragma once
 
-#include <__inttypes.h>
+#include <gen/inttypes.h>
 #include <stdint.h>
 
 intmax_t strtoimax(const char * restrict str, char ** restrict str_end, int base);

@@ -17,11 +17,14 @@ libdeepc:
 
 clean:
 	cd ../src && make clean
-	rm -f ${single-file-tests}
+	rm -rf bin
+
+bindir:
+	mkdir bin || true
 
 define make-single-target
-  $1:
-	  $(COMMAND) -o $1 $1-test.c $(LIBS)
+  $1: bindir
+	  $(COMMAND) -o bin/$1 $1-test.c $(LIBS)
 endef
 
 $(foreach element,$(single-file-tests),$(eval $(call make-single-target,$(element))))

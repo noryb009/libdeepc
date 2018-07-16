@@ -1,6 +1,6 @@
 #pragma once
 
-#include <__limits.h>
+#include <gen/limits.h>
 
 #define   CHAR_BIT   __CHAR_BIT
 #define   CHAR_MIN   __CHAR_MIN

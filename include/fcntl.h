@@ -1,6 +1,6 @@
 #pragma once
 
-#include <__stdint.h>
+#include <gen/stdint.h>
 
 #define O_ACCMODE        03U
 #define O_RDONLY         00U

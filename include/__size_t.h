@@ -1,5 +1,5 @@
 #pragma once
 
-#include <__stdint.h>
+#include <gen/stdint.h>
 
 typedef __size_t size_t;

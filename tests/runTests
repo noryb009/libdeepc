@@ -36,48 +36,48 @@ function expectIO() {
   fi
 }
 
-expect 0 ./true
-expect 1 ./false
-expect 1 ./argc
-expect 2 ./argc a
-expect 0 ./stdint
-expect 0 ./stdarg
-expect 2 ./assert
-expectIO 1 "" $'Assert failed:\n  Cond: 0 == 1\n  File: assert-fail-test.c:9\n  Func: main' ./assert-fail
-expect 3 ./string
-expect 5 ./strlen abcde
-expect 0 ./strlen ""
-expect 7 ./strlen zyxwvut
-expect 5 ./setjmp
-expect 0 ./malloc
-expectIO 0 "" $'abcd\nefgh' ./chario "abcd" "efgh"
-expectIO 0 $'abcd\nefgh' $'abcd\nefgh' ./echo
-expect 0 ./ctype
-expectIO 0 "" $'abc, defgh, i' ./printf
-expect 0 ./sprintf
-expect 0 ./qsort
-expect 0 ./bsearch
-expect 0 ./strdup
-expect 0 ./atomic-flag
-expect 0 ./mtx
-expectIO 0 "" "Sum is: 1000000" '' ./threads2
-expect 0 ./tls
-expect 0 ./tss
-expect 0 ./math
-expect 0 ./iso646
-expect 0 ./time
-expectIO 136 "" $'S8' '' ./signal
-TEST="123" TEST2="456" expectIO 0 "" $'TEST is: TEST=123\nTEST2 is: 456' ./env
-TEST="" TEST2="" expectIO 0 "" $'TEST is: TEST=\nTEST2 is: ' ./env
+expect 0 bin/true
+expect 1 bin/false
+expect 1 bin/argc
+expect 2 bin/argc a
+expect 0 bin/stdint
+expect 0 bin/stdarg
+expect 2 bin/assert
+expectIO 1 "" $'Assert failed:\n  Cond: 0 == 1\n  File: assert-fail-test.c:9\n  Func: main' bin/assert-fail
+expect 3 bin/string
+expect 5 bin/strlen abcde
+expect 0 bin/strlen ""
+expect 7 bin/strlen zyxwvut
+expect 5 bin/setjmp
+expect 0 bin/malloc
+expectIO 0 "" $'abcd\nefgh' bin/chario "abcd" "efgh"
+expectIO 0 $'abcd\nefgh' $'abcd\nefgh' bin/echo
+expect 0 bin/ctype
+expectIO 0 "" $'abc, defgh, i' bin/printf
+expect 0 bin/sprintf
+expect 0 bin/qsort
+expect 0 bin/bsearch
+expect 0 bin/strdup
+expect 0 bin/atomic-flag
+expect 0 bin/mtx
+expectIO 0 "" "Sum is: 1000000" '' bin/threads2
+expect 0 bin/tls
+expect 0 bin/tss
+expect 0 bin/math
+expect 0 bin/iso646
+expect 0 bin/time
+expectIO 136 "" $'S8' '' bin/signal
+TEST="123" TEST2="456" expectIO 0 "" $'TEST is: TEST=123\nTEST2 is: 456' bin/env
+TEST="" TEST2="" expectIO 0 "" $'TEST is: TEST=\nTEST2 is: ' bin/env
 
 touch test-data/unreadable
 chmod 000 test-data/unreadable
-expect 0 ./file
+expect 0 bin/file
 # Run file twice, in case it changed any files.
-expect 0 ./file
-expectIO 0 "" $'a' ./system
+expect 0 bin/file
+expectIO 0 "" $'a' bin/system
 
-thr_output="$(./threads)"
+thr_output="$(bin/threads)"
 for i in `seq 5`; do
   if [[ "$i" != "$(echo "$thr_output" | grep -c "Running, val: $i")" ]]; then
     echo "Invalid output from ./threads (with $i)"

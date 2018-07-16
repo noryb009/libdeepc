@@ -1,7 +1,7 @@
 // POSIX requires assert to be redefined according to NDEBUG whenever
 // this file is included, so this file doesn't have a header guard.
 
-#include <__stdint.h>
+#include <gen/stdint.h>
 
 #undef assert
 
