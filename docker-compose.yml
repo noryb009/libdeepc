@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  libdeepc:
+    build: .
+    image: libdeepc/libdeepc
+    volumes:
+        - .:/libdeepc
+    stdin_open: true
+    tty: true

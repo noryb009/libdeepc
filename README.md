@@ -13,3 +13,17 @@ optimized yet.
 
 There are plenty of bugs in this library. Many functions are not yet
 implemented. For example, `free` doesn't do anything (yet).
+
+# How to start development in Docker
+
+
+Build the container with docker-compose:
+```
+docker-compose build
+```
+
+Run the container:
+```
+docker-compose run libdeepc
+```
+
