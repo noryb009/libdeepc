@@ -79,7 +79,6 @@ touch test-data/readable
 printf "This file\nhas been read.\n" > test-data/readable
 chmod 444 test-data/readable
 touch test-data/unreadable
-touch test-data/unreadable
 chmod 000 test-data/unreadable
 expect 0 bin/file
 # Run file twice, in case it changed any files.
