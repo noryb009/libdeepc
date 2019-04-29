@@ -3,9 +3,12 @@
 #include <string.h>
 
 int main(void) {
-  assert(malloc(0) == NULL);
-  assert(realloc(NULL, 0) == NULL);
   free(NULL);
+
+  void *p = malloc(0);
+  free(p);
+  p = realloc(NULL, 0);
+  free(p);
 
   const char *str = "abcdefg";
   void *a = malloc(4);

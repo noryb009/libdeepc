@@ -3,5 +3,6 @@ tests/bin
 tests/test-data/scratch
 tests/test-data/unreadable
 scripts/size-of.c
+src/gen
 */*.o
 */*.a
