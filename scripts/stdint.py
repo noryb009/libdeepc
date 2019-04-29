@@ -98,7 +98,10 @@ def make_stdint(
   def define_f(f: Any, dst: str, src: str) -> None:
     f.write('#define {} {}\n'.format(dst, src))
 
-  with open('../include/gen/stdint.h', 'w+') as f:
+  gen_folder = '../include/gen'
+  if not os.path.exists(gen_folder):
+    os.mkdir(gen_folder)
+  with open(gen_folder + '/stdint.h', 'w+') as f:
     def define(dst: str, src: str) -> None:
       define_f(f, dst, src)
 
@@ -182,7 +185,7 @@ def make_stdint(
     define(' __PTRDIFF_MAX', ' __INT{}_MAX'.format(ptr_size))
     define('__SIZE_MAX',     '__UINT{}_MAX'.format(ptr_size))
 
-  with open('../include/gen/inttypes.h', 'w+') as f:
+  with open(gen_folder + '/inttypes.h', 'w+') as f:
     def define(dst: str, src: str) -> None:
       define_f(f, dst, src)
 
@@ -216,7 +219,7 @@ def make_stdint(
     output_symbol('MAX', 'j')
     output_symbol('PTR', 't')
 
-  with open('../include/gen/limits.h', 'w+') as f:
+  with open(gen_folder + '/limits.h', 'w+') as f:
     def define(dst: str, src: str) -> None:
       define_f(f, dst, src)
 
