@@ -1,7 +1,6 @@
 include/gen
 tests/bin
-tests/test-data/scratch
-tests/test-data/unreadable
+tests/test-data/
 scripts/size-of.c
 */*.o
 */*.a

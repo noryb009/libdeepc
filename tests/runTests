@@ -70,6 +70,15 @@ expectIO 136 "" $'S8' '' bin/signal
 TEST="123" TEST2="456" expectIO 0 "" $'TEST is: TEST=123\nTEST2 is: 456' bin/env
 TEST="" TEST2="" expectIO 0 "" $'TEST is: TEST=\nTEST2 is: ' bin/env
 
+# Create test files
+if [ ! -d test-data  ]; then
+    mkdir test-data
+fi
+rm test-data/*
+touch test-data/readable
+printf "This file\nhas been read.\n" > test-data/readable
+chmod 444 test-data/readable
+touch test-data/unreadable
 touch test-data/unreadable
 chmod 000 test-data/unreadable
 expect 0 bin/file
