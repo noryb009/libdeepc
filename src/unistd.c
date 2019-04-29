@@ -6,6 +6,15 @@
 
 #include "syscall.h"
 
+int brk(void *addr) {
+  const uint64_t new_break = __syscall1((uint64_t)addr, SYS_BRK);
+  if ((uintptr_t)addr < (uintptr_t)new_break) {
+    errno = ENOMEM;
+    return -1;
+  }
+  return 0;
+}
+
 void *sbrk(intptr_t increment) {
   const uint64_t cur_break = __syscall1(0, SYS_BRK);
   if (increment == 0) {
